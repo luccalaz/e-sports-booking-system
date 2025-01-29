@@ -1,5 +1,7 @@
+import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import LogoutButton from "@/components/logout-button";
 
 export default async function Home() {
 
@@ -12,7 +14,9 @@ export default async function Home() {
 
   return (
     <>
-      Hello world
+      Logged in! User info: 
+      <pre>{JSON.stringify(data.user, null, 2)}</pre>
+      <LogoutButton/>
     </>
   );
 }
