@@ -20,7 +20,7 @@ export function VerificationForm({ schoolID, type } : { schoolID : string, type 
     })
 
     async function onSubmitOtp(values: z.infer<typeof otpformSchema>) {
-        const error = await verifyotp(schoolID, values.otp);
+        const error = await verifyotp(schoolID, values);
 
         if (error) {
             return toast.error(error);

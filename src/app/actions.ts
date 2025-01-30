@@ -1,23 +1,29 @@
 "use server"
 
+import { otpformSchema } from "@/utils/formSchemas";
 import { createClient } from "@/utils/supabase/server";
 
+export async function verifyotp(schoolID: string, clientData: unknown) {
+    // server validation
+    const result = otpformSchema.safeParse(clientData);
 
-export async function verifyotp(schoolID: string, otp: string) {
+    if (!result.success) {
+        return result.error.issues[0].message;
+    }
+
+    // try verifying otp and login
     const supabase = await createClient();
-
-    // type-casting here for convenience
-    // in practice, you should validate your inputs
 
     const { error } = await supabase.auth.verifyOtp({
         email: schoolID + "@nscc.ca",
-        token: otp,
+        token: result.data.otp,
         type: 'email',
     });
 
-    if (error && error.code == "otp_expired") {
+    if (error?.code == "otp_expired") {
         return "Code has expired or is invalid.";
     } else if (error) {
+        console.error(error);
         return "An unexpected error has occured."
     }
 }

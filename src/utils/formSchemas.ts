@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const otpformSchema = z.object({
-    otp: z.string().min(2, {
+    otp: z.string().nonempty({
         message: "The code is required to verify.",
     }).max(6),
 })
