@@ -43,7 +43,7 @@ export function VerificationForm({ schoolID, type } : { schoolID : string, type 
                 <div className="flex flex-col items-center">
                     <Mail size={50} />
                     <h2 className="text-2xl font-bold mt-1">{type == "login" ? "Check your email" : "Verify your account"}</h2>
-                    <div className="text-sm text-zinc-500 pt-2">Type in the code sent to your NSCC email to continue</div>
+                    <div className="text-sm text-center text-zinc-500 pt-2">Type in the code sent to your NSCC email to continue</div>
                 </div>
                 <FormField control={otpform.control} name="otp" render={({ field }) => (
                     <FormItem className="flex justify-center">
