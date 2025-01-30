@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { toast } from "sonner"
 import { VerificationForm } from "@/components/verification-form"
 import SignupForm from "@/components/signup-form";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export default function SignupPage() {
     const [page, setPage] = useState<number>(1);
@@ -18,7 +19,14 @@ export default function SignupPage() {
             <VerificationForm schoolID={schoolID} type="login" />
         )
     } else {
-        toast.error("An unexpected error has occured.");
-        return <></>;
+        return (
+            <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>
+                    An unexpected error has occured.
+                </AlertDescription>
+            </Alert>
+        );
     }
 }

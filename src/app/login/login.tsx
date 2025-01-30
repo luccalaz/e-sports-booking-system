@@ -1,17 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { toast } from "sonner"
+import { useState } from "react"
 import { VerificationForm } from "@/components/verification-form"
 import LoginForm from "@/components/login-form"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
 
 export default function LoginPage() {
     const [page, setPage] = useState<number>(1);
     const [schoolID, setSchoolID] = useState<string>("");
-
-    useEffect(() => {
-        console.log(">>> VAR UPDATED: " + page + " and " + schoolID)
-    }, [page, schoolID]);
 
     if (page == 1) {
         return (
@@ -22,7 +19,14 @@ export default function LoginPage() {
             <VerificationForm schoolID={schoolID} type="login"/>
         )
     } else {
-        toast.error("An unexpected error has occured.");
-        return <></>;
+        return (
+            <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>
+                    An unexpected error has occured.
+                </AlertDescription>
+            </Alert>
+        );
     }
 }

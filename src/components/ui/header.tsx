@@ -8,7 +8,7 @@ interface HeaderProps {
 
 export default function Header({ loggedIn = false }: HeaderProps) {
     return (
-        <header className="sticky top-0 px-5 lg:px-14 h-16 border border-b-zinc-200 bg-white">
+        <header className="sticky top-0 px-5 lg:px-14 h-16 border border-b border-b-zinc-200 bg-white">
             <div className="h-full flex justify-between items-center">
                 <Logo />
                 <Button className="text-foreground" variant="link" asChild>
