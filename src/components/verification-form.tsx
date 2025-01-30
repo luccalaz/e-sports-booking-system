@@ -1,4 +1,4 @@
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem } from '@/components/ui/form'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 import { Button } from '@/components/ui/button'
 import { useForm } from "react-hook-form"
@@ -34,7 +34,7 @@ export function VerificationForm({ schoolID, type } : { schoolID : string, type 
         return redirect("/");
     }
 
-    function onError(errors: Object) {
+    function onError(errors: object) {
         const firstError = Object.values(errors)[0];
         if (firstError) {
             toast.error(firstError.message);
