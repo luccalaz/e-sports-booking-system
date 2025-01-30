@@ -63,7 +63,7 @@ export default function SignupForm({ setSchoolID, setPage }: { setSchoolID: Disp
                     <h2 className="text-2xl font-bold">Create an account</h2>
                     <div className="text-sm text-zinc-500 pt-2">All we need is some basic information for bookings</div>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-col lg:flex-row gap-6 lg:gap-3">
                     <FormField control={form.control} name="firstName" render={({ field }) => (
                         <FormItem>
                             <FormLabel>First name</FormLabel>
@@ -93,13 +93,8 @@ export default function SignupForm({ setSchoolID, setPage }: { setSchoolID: Disp
                     </FormItem>
                 )} />
                 <div className="space-y-3">
-                    <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                        {form.formState.isSubmitting ? (
-                            <Loader2 className="animate-spin" />
-                        ) : (
-                            "Send verification link"
-                        )}
-                        {form.formState.isSubmitting && " Sending verification link..."}
+                    <Button type="submit" className="w-full" loading={form.formState.isSubmitting ? "Sending verification code.." : undefined}>
+                        Send verification code
                     </Button>
                     <div className="text-sm text-center mt-">
                         <span>Already have an account? </span>
