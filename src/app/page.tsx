@@ -1,9 +1,21 @@
-import Image from "next/image";
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
+import LogoutButton from "@/components/logout-button";
 
-export default function Home() {
+export default async function Home() {
+
+  const supabase = await createClient()
+
+  const { data, error } = await supabase.auth.getUser()
+  if (error || !data?.user) {
+    redirect('/login')
+  }
+
   return (
     <>
-      Hello world
+      Logged in! User info: 
+      <pre>{JSON.stringify(data.user, null, 2)}</pre>
+      <LogoutButton/>
     </>
   );
 }
