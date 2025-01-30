@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function capitalizeFirstLetter(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1)
+  return string.replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 export function genPass(len: number, upper: boolean = true, nums: boolean = true, special: boolean = true) {

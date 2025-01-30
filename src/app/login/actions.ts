@@ -9,13 +9,13 @@ export async function login(formData: LoginFormData) {
   // type-casting here for convenience
   // in practice, you should validate your inputs
 
-  const { data: dbData } = await supabase.from('profiles').select().eq("nscc_id", formData.schoolID.toUpperCase());
+  const { data } = await supabase.from('profiles').select().eq("nscc_id", formData.schoolID.toUpperCase());
 
-  if (!dbData || dbData.length == 0) {
-    return new Error("User doesn't exist. Please sign up.");
+  if (!data || data.length == 0) {
+    return "User doesn't exist. Please sign up.";
   }
 
-  const { data, error } = await supabase.auth.signInWithOtp({
+  const { error } = await supabase.auth.signInWithOtp({
     email: formData.schoolID + '@nscc.ca',
     options: {
       shouldCreateUser: false,
@@ -23,8 +23,6 @@ export async function login(formData: LoginFormData) {
   });
 
   if (error) {
-    return error;
+    return "An unexpected error has occured.";
   }
-
-  return data;
 }

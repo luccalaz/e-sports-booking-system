@@ -10,13 +10,13 @@ export async function signup(formData: SignupFormData) {
   // type-casting here for convenience
   // in practice, you should validate your inputs
 
-  const { data: dbData } = await supabase.from('profiles').select().eq("nscc_id", formData.schoolID.toUpperCase());
+  const { data } = await supabase.from('profiles').select().eq("nscc_id", formData.schoolID.toUpperCase());
 
-  if (dbData && dbData.length > 0) {
-    return new Error("User already exists. Please log in.");
+  if (data && data.length > 0) {
+    return "User already exists. Please log in.";
   }
 
-  const { data, error } = await supabase.auth.signInWithOtp({
+  const { error } = await supabase.auth.signInWithOtp({
     email: formData.schoolID + "@nscc.ca",
     options: {
       data: {
@@ -28,8 +28,6 @@ export async function signup(formData: SignupFormData) {
   })
 
   if (error) {
-    return error;
+    return "An unexpected error has occured.";
   }
-
-  return data;
 }

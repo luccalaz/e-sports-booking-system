@@ -8,26 +8,22 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { verifyotp } from '@/app/actions'
 import { toast } from 'sonner'
 import { redirect } from 'next/navigation'
-
-const otpformSchema = z.object({
-    otp2: z.string().min(2, {
-        message: "The code is required to verify.",
-    }),
-})
+import { REGEXP_ONLY_DIGITS } from 'input-otp'
+import { otpformSchema } from '@/utils/formSchemas'
 
 export function VerificationForm({ schoolID, type } : { schoolID : string, type : string}) {
     const otpform = useForm<z.infer<typeof otpformSchema>>({
         resolver: zodResolver(otpformSchema),
         defaultValues: {
-            otp2: "",
+            otp: "",
         },
     })
 
     async function onSubmitOtp(values: z.infer<typeof otpformSchema>) {
-        const result = await verifyotp(schoolID, values.otp2);
+        const error = await verifyotp(schoolID, values.otp);
 
-        if (result instanceof Error) {
-            return toast.error(result.message);
+        if (error) {
+            return toast.error(error);
         }
 
         toast.success("Logged in successfully");
@@ -49,10 +45,10 @@ export function VerificationForm({ schoolID, type } : { schoolID : string, type 
                     <h2 className="text-2xl font-bold mt-1">{type == "login" ? "Check your email" : "Verify your account"}</h2>
                     <div className="text-sm text-zinc-500 pt-2">Type in the code sent to your NSCC email to continue</div>
                 </div>
-                <FormField control={otpform.control} name="otp2" render={({ field }) => (
+                <FormField control={otpform.control} name="otp" render={({ field }) => (
                     <FormItem className="flex justify-center">
                         <FormControl>
-                            <InputOTP maxLength={6} {...field}>
+                            <InputOTP autoFocus maxLength={6} pattern={REGEXP_ONLY_DIGITS} {...field}>
                                 <InputOTPGroup>
                                     <InputOTPSlot index={0} />
                                     <InputOTPSlot index={1} />
@@ -65,7 +61,7 @@ export function VerificationForm({ schoolID, type } : { schoolID : string, type 
                         </FormControl>
                     </FormItem>
                 )} />
-                <Button type="submit" className="w-full" disabled={otpform.watch('otp2').length < 6} 
+                <Button type="submit" className="w-full" disabled={otpform.watch('otp').length < 6} 
                 loading={otpform.formState.isSubmitting ? (type == "login" ? "Logging in..." : "Verifying account...") : undefined}>
                     {type == "login" ? "Login" : "Verify account"}
                 </Button>

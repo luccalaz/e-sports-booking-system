@@ -10,25 +10,12 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } fr
 import { Input } from '@/components/ui/input'
 import { Button } from "@/components/ui/button"
 import { signup } from "@/app/signup/actions"
+import { signupformSchema } from "@/utils/formSchemas"
 
-
-const formSchema = z.object({
-    firstName: z.string().nonempty({
-        message: "First name is required.",
-    }),
-    lastName: z.string().nonempty({
-        message: "Last name is required.",
-    }),
-    schoolID: z.string().nonempty({
-        message: "School ID is required.",
-    }).regex(/^w\d{7}$/i, {
-        message: "Invalid school ID.",
-    }),
-})
 
 export default function SignupForm({ setSchoolID, setPage }: { setSchoolID: Dispatch<SetStateAction<string>>, setPage: Dispatch<SetStateAction<number>> }) {
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
+    const form = useForm<z.infer<typeof signupformSchema>>({
+        resolver: zodResolver(signupformSchema),
         defaultValues: {
             firstName: "",
             lastName: "",
@@ -36,11 +23,11 @@ export default function SignupForm({ setSchoolID, setPage }: { setSchoolID: Disp
         },
     })
 
-    async function onSubmit(values: z.infer<typeof formSchema>) {
-        const result = await signup(values)
+    async function onSubmit(values: z.infer<typeof signupformSchema>) {
+        const error = await signup(values)
 
-        if (result instanceof Error) {
-            return toast.error(result.message);
+        if (error) {
+            return toast.error(error);
         }
 
         toast.success("Email sent to " + values.schoolID + "@nscc.ca")

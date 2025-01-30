@@ -10,29 +10,22 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { login } from "@/app/login/actions"
-
-const formSchema = z.object({
-    schoolID: z.string().nonempty({
-        message: "School ID is required.",
-    }).regex(/^w\d{7}$/i, {
-        message: "Invalid school ID.",
-    }),
-})
+import { loginformSchema } from "@/utils/formSchemas"
 
 export default function LoginForm({ setSchoolID, setPage } : { setSchoolID : Dispatch<SetStateAction<string>>, setPage : Dispatch<SetStateAction<number>> }) {
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
+    const form = useForm<z.infer<typeof loginformSchema>>({
+        resolver: zodResolver(loginformSchema),
         defaultValues: {
             schoolID: "",
         },
     })
 
-    async function onSubmit(values: z.infer<typeof formSchema>) {
-        const result = await login(values)
+    async function onSubmit(values: z.infer<typeof loginformSchema>) {
+        const error = await login(values)
 
-        if (result instanceof Error) {
-            return toast.error(result.message);
+        if (error) {
+            return toast.error(error);
         }
 
         toast.success("Email sent to " + values.schoolID + "@nscc.ca")
