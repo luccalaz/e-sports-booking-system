@@ -1,6 +1,6 @@
 "use client"
 
-import { Dispatch, SetStateAction, useState } from "react"
+import { Dispatch, SetStateAction } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -9,7 +9,6 @@ import { toast } from "sonner"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from "@/components/ui/button"
-import { Loader2 } from "lucide-react"
 import { signup } from "@/app/signup/actions"
 
 
@@ -49,7 +48,7 @@ export default function SignupForm({ setSchoolID, setPage }: { setSchoolID: Disp
         return setPage(2);
     }
 
-    function onError(errors: Object) {
+    function onError(errors: object) {
         const firstError = Object.values(errors)[0];
         if (firstError) {
             toast.error(firstError.message);

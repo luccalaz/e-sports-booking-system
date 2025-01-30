@@ -1,6 +1,6 @@
 "use server"
 
-import { capitalizeFirstLetter, genPass } from "@/lib/utils"
+import { capitalizeFirstLetter } from "@/lib/utils"
 import { createClient } from "@/utils/supabase/server"
 import { SignupFormData } from "@/utils/types"
 

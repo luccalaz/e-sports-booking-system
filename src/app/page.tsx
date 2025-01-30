@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import LogoutButton from "@/components/logout-button";

@@ -40,7 +40,7 @@ export default function LoginForm({ setSchoolID, setPage } : { setSchoolID : Dis
         return setPage(2);
     }
 
-    function onError(errors: Object) {
+    function onError(errors: object) {
         const firstError = Object.values(errors)[0];
         if (firstError) {
             toast.error(firstError.message);
