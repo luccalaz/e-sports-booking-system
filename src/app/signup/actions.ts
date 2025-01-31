@@ -15,7 +15,7 @@ export async function signup(clientData: unknown) {
   const formData = result.data;
   
   // check if user already exists
-  const supabase = await createClient()
+  const supabase = await createClient();
   const { data } = await supabase.from('profiles').select().eq("nscc_id", formData.schoolID.toUpperCase());
 
   if (data && data.length > 0) {
