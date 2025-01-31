@@ -56,7 +56,12 @@ export default function LoginForm({ setSchoolID, setPage } : { setSchoolID : Dis
                     </FormItem>
                 )} />
                 <div className="space-y-3">
-                    <Button type="submit" className="w-full" loading={form.formState.isSubmitting ? "Sending login code.." : undefined}>
+                    <Button 
+                        type="submit" 
+                        className="w-full" 
+                        disabled={!form.formState.isValid  || form.formState.isSubmitting}
+                        loading={form.formState.isSubmitting ? "Sending login code.." : undefined}
+                    >
                         Send login code
                     </Button>
                     <div className="text-sm text-center mt-">

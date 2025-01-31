@@ -79,7 +79,12 @@ export default function SignupForm({ setSchoolID, setPage }: { setSchoolID: Disp
                     </FormItem>
                 )} />
                 <div className="space-y-3">
-                    <Button type="submit" className="w-full" loading={form.formState.isSubmitting ? "Sending verification code.." : undefined}>
+                    <Button 
+                        type="submit"
+                        className="w-full"
+                        disabled={!form.formState.isValid || form.formState.isSubmitting}
+                        loading={form.formState.isSubmitting ? "Sending verification code.." : undefined}
+                    >
                         Send verification code
                     </Button>
                     <div className="text-sm text-center mt-">
