@@ -44,7 +44,7 @@ export default function LoginForm({ setSchoolID, setPage } : { setSchoolID : Dis
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-6">
                 <div className="text-center">
-                    <h2 className="text-2xl font-bold">Welcome back</h2>
+                    <h2 className="text-2xl font-bold text-title">Welcome back</h2>
                     <div className="text-sm text-zinc-500 pt-2">Enter your school ID to login and start booking</div>
                 </div>
                 <FormField control={form.control} name="schoolID" render={({ field }) => (
