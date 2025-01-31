@@ -1,18 +1,8 @@
 import FlowCard from '@/components/ui/flow-card'
 import Header from '@/components/ui/header'
-import { createClient } from '@/utils/supabase/server'
-import { redirect } from 'next/navigation'
 import SignupPage from './signup'
 
 export default async function Signup() {
-  const supabase = await createClient()
-
-  const { data, error } = await supabase.auth.getUser()
-
-  if (!error || data.user) {
-    redirect("/");
-  }
-
   return (
     <>
       <Header />

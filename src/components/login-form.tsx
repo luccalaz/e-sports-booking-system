@@ -44,7 +44,7 @@ export default function LoginForm({ setSchoolID, setPage } : { setSchoolID : Dis
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-6">
                 <div className="text-center">
-                    <h2 className="text-2xl font-bold">Welcome back</h2>
+                    <h2 className="text-2xl font-bold text-title">Welcome back</h2>
                     <div className="text-sm text-zinc-500 pt-2">Enter your school ID to login and start booking</div>
                 </div>
                 <FormField control={form.control} name="schoolID" render={({ field }) => (
@@ -56,7 +56,12 @@ export default function LoginForm({ setSchoolID, setPage } : { setSchoolID : Dis
                     </FormItem>
                 )} />
                 <div className="space-y-3">
-                    <Button type="submit" className="w-full" loading={form.formState.isSubmitting ? "Sending login code.." : undefined}>
+                    <Button 
+                        type="submit" 
+                        className="w-full" 
+                        disabled={!form.formState.isValid  || form.formState.isSubmitting}
+                        loading={form.formState.isSubmitting ? "Sending login code.." : undefined}
+                    >
                         Send login code
                     </Button>
                     <div className="text-sm text-center mt-">

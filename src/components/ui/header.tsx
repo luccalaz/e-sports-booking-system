@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import Link from "next/link";
 import Logo from "./logo";
+import { ModeToggle } from './mode-toggle';
 
 interface HeaderProps {
     loggedIn?: boolean;
@@ -8,14 +9,17 @@ interface HeaderProps {
 
 export default function Header({ loggedIn = false }: HeaderProps) {
     return (
-        <header className="sticky top-0 px-5 lg:px-14 h-16 border border-b border-b-zinc-200 bg-white">
+        <header className="sticky top-0 px-3 md:px-14 h-16 border-b bg-background">
             <div className="h-full flex justify-between items-center">
                 <Logo />
-                <Button className="text-foreground" variant="link" asChild>
-                    <Link href={loggedIn ? "/bookings" : "/login"}>
-                        {loggedIn ? "My Bookings" : "Login"}
-                    </Link>
-                </Button>
+                <div className="flex gap-1">
+                    <Button className="text-foreground" variant="link" asChild>
+                        <Link href={loggedIn ? "/bookings" : "/login"}>
+                            {loggedIn ? "My Bookings" : "Login"}
+                        </Link>
+                    </Button>
+                    <ModeToggle/>
+                </div>
             </div>
         </header>
     )

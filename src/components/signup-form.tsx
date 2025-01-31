@@ -46,7 +46,7 @@ export default function SignupForm({ setSchoolID, setPage }: { setSchoolID: Disp
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-6">
                 <div className="text-center">
-                    <h2 className="text-2xl font-bold">Create an account</h2>
+                    <h2 className="text-2xl font-bold text-title">Create an account</h2>
                     <div className="text-sm text-zinc-500 pt-2">All we need is some basic information for bookings</div>
                 </div>
                 <div className="flex flex-col lg:flex-row gap-6 lg:gap-3">
@@ -79,7 +79,12 @@ export default function SignupForm({ setSchoolID, setPage }: { setSchoolID: Disp
                     </FormItem>
                 )} />
                 <div className="space-y-3">
-                    <Button type="submit" className="w-full" loading={form.formState.isSubmitting ? "Sending verification code.." : undefined}>
+                    <Button 
+                        type="submit"
+                        className="w-full"
+                        disabled={!form.formState.isValid || form.formState.isSubmitting}
+                        loading={form.formState.isSubmitting ? "Sending verification code.." : undefined}
+                    >
                         Send verification code
                     </Button>
                     <div className="text-sm text-center mt-">

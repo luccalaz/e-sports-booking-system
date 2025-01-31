@@ -3,7 +3,7 @@ import { z } from "zod";
 export const otpformSchema = z.object({
     otp: z.string().nonempty({
         message: "The code is required to verify.",
-    }).max(6),
+    }).min(6).max(6),
 })
 
 export const signupformSchema = z.object({
