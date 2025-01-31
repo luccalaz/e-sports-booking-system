@@ -16,7 +16,7 @@ export default function LoginPage() {
         )
     } else if (page == 2) {
         return (
-            <VerificationForm schoolID={schoolID} type="login"/>
+            <VerificationForm schoolID={schoolID}/>
         )
     } else {
         return (

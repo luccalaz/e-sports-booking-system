@@ -11,7 +11,7 @@ import { redirect } from 'next/navigation'
 import { REGEXP_ONLY_DIGITS } from 'input-otp'
 import { otpformSchema } from '@/utils/formSchemas'
 
-export function VerificationForm({ schoolID, type }: { schoolID: string, type: string }) {
+export function VerificationForm({ schoolID }: { schoolID: string }) {
     const otpform = useForm<z.infer<typeof otpformSchema>>({
         resolver: zodResolver(otpformSchema),
         defaultValues: {
