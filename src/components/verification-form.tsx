@@ -11,7 +11,7 @@ import { redirect } from 'next/navigation'
 import { REGEXP_ONLY_DIGITS } from 'input-otp'
 import { otpformSchema } from '@/utils/formSchemas'
 
-export function VerificationForm({ schoolID, type } : { schoolID : string, type : string}) {
+export function VerificationForm({ schoolID, type }: { schoolID: string, type: string }) {
     const otpform = useForm<z.infer<typeof otpformSchema>>({
         resolver: zodResolver(otpformSchema),
         defaultValues: {
@@ -23,7 +23,7 @@ export function VerificationForm({ schoolID, type } : { schoolID : string, type 
         const error = await verifyotp(schoolID, values);
 
         if (error) {
-            return toast.error(error);
+            return toast.error(error.message);
         }
 
         toast.success("Logged in successfully");
@@ -42,7 +42,7 @@ export function VerificationForm({ schoolID, type } : { schoolID : string, type 
             <form onSubmit={otpform.handleSubmit(onSubmitOtp, onError)} className="space-y-6 flex flex-col justify-center">
                 <div className="flex flex-col items-center">
                     <Mail className="text-title" size={50} />
-                    <h2 className="text-2xl text-title font-bold mt-1">{type == "login" ? "Check your email" : "Verify your account"}</h2>
+                    <h2 className="text-2xl text-title font-bold mt-1">Check your email</h2>
                     <div className="text-sm text-center text-zinc-500 pt-2">Type in the code sent to your NSCC email to continue</div>
                 </div>
                 <FormField control={otpform.control} name="otp" render={({ field }) => (
@@ -61,12 +61,13 @@ export function VerificationForm({ schoolID, type } : { schoolID : string, type 
                         </FormControl>
                     </FormItem>
                 )} />
-                <Button 
-                    type="submit" 
-                    className="w-full" 
-                    disabled={!otpform.formState.isValid || otpform.formState.isSubmitting} 
-                    loading={otpform.formState.isSubmitting ? (type == "login" ? "Logging in..." : "Verifying account...") : undefined}>
-                    {type == "login" ? "Login" : "Verify account"}
+                <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={!otpform.formState.isValid || otpform.formState.isSubmitting}
+                    loading={otpform.formState.isSubmitting ? "Logging in..." : undefined}
+                >
+                    Login
                 </Button>
             </form>
         </Form >

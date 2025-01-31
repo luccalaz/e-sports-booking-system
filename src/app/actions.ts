@@ -8,7 +8,10 @@ export async function verifyotp(schoolID: string, clientData: unknown) {
     const result = otpformSchema.safeParse(clientData);
 
     if (!result.success) {
-        return result.error.issues[0].message;
+        return {
+            code: 'VALIDATION_ERROR',
+            message: result.error.issues[0].message
+        };
     }
 
     // try verifying otp and login
@@ -21,9 +24,15 @@ export async function verifyotp(schoolID: string, clientData: unknown) {
     });
 
     if (error?.code == "otp_expired") {
-        return "Code has expired or is invalid.";
+        return {
+            code: 'CODE_INVALID',
+            message: "Code has expired or is invalid."
+        };
     } else if (error) {
         console.error(error);
-        return "An unexpected error has occured."
+        return {
+            code: 'AUTH_ERROR',
+            message: "An unexpected error has occurred."
+        };
     }
 }

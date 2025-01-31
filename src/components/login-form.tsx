@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { login } from "@/app/login/actions"
 import { loginformSchema } from "@/utils/formSchemas"
+import { redirect } from "next/navigation"
 
 export default function LoginForm({ setSchoolID, setPage } : { setSchoolID : Dispatch<SetStateAction<string>>, setPage : Dispatch<SetStateAction<number>> }) {
 
@@ -22,13 +23,14 @@ export default function LoginForm({ setSchoolID, setPage } : { setSchoolID : Dis
     })
 
     async function onSubmit(values: z.infer<typeof loginformSchema>) {
-        const error = await login(values)
+        const error = await login(values);
 
         if (error) {
-            return toast.error(error);
+            toast.error(error.message);
+            if (error.code === "USER_NOT_FOUND") return redirect("/signup");
         }
 
-        toast.success("Email sent to " + values.schoolID + "@nscc.ca")
+        toast.success("Email sent to " + values.schoolID + "@nscc.ca");
         setSchoolID(values.schoolID);
         return setPage(2);
     }

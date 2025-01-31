@@ -8,7 +8,10 @@ export async function login(clientData: unknown) {
   const result = loginformSchema.safeParse(clientData);
 
   if (!result.success) {
-    return result.error.issues[0].message;
+    return {
+      code: 'VALIDATION_ERROR',
+      message: result.error.issues[0].message
+    };
   }
 
   const formData = result.data;
@@ -18,10 +21,13 @@ export async function login(clientData: unknown) {
   const { data } = await supabase.from('profiles').select().eq("nscc_id", formData.schoolID.toUpperCase());
 
   if (!data || data.length == 0) {
-    return "User doesn't exist. Please sign up.";
+    return {
+      code: 'USER_NOT_FOUND',
+      message: "User doesn't exist. Please sign up."
+    };
   }
 
-  // try login up
+  // try login
   const { error } = await supabase.auth.signInWithOtp({
     email: formData.schoolID + '@nscc.ca',
     options: {
@@ -32,6 +38,11 @@ export async function login(clientData: unknown) {
   // error if any
   if (error) {
     console.error(error);
-    return "An unexpected error has occured.";
+    return {
+      code: 'AUTH_ERROR',
+      message: "An unexpected error has occurred."
+    };
   }
+
+  return { success: true };
 }

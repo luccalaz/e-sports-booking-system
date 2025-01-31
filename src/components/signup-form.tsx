@@ -27,10 +27,10 @@ export default function SignupForm({ setSchoolID, setPage }: { setSchoolID: Disp
         const error = await signup(values)
 
         if (error) {
-            return toast.error(error);
+            toast.error(error.message);
         }
 
-        toast.success("Email sent to " + values.schoolID + "@nscc.ca")
+        toast.success("Email sent to " + values.schoolID + "@nscc.ca");
         setSchoolID(values.schoolID);
         return setPage(2);
     }

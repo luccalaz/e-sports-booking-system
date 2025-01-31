@@ -7,22 +7,18 @@ import { createClient } from "@/utils/supabase/server"
 export async function signup(clientData: unknown) {
   // server validation
   const result = signupformSchema.safeParse(clientData);
-  
+
   if (!result.success) {
-    return result.error.issues[0].message;
+    return {
+      code: 'VALIDATION_ERROR',
+      message: result.error.issues[0].message
+    };
   }
-  
+
   const formData = result.data;
   
-  // check if user already exists
-  const supabase = await createClient();
-  const { data } = await supabase.from('profiles').select().eq("nscc_id", formData.schoolID.toUpperCase());
-
-  if (data && data.length > 0) {
-    return "User already exists. Please log in.";
-  }
-
   // try sign up
+  const supabase = await createClient();
   const { error } = await supabase.auth.signInWithOtp({
     email: formData.schoolID + "@nscc.ca",
     options: {
@@ -37,6 +33,9 @@ export async function signup(clientData: unknown) {
   // error if any
   if (error) {
     console.error(error);
-    return "An unexpected error has occured.";
+    return {
+      code: 'AUTH_ERROR',
+      message: "An unexpected error has occurred."
+    };
   }
 }
