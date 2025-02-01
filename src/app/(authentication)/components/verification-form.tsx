@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form"
 import { Mail } from 'lucide-react'
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
-import { verifyotp } from '@/app/actions'
+import { verifyotp } from '@/app/(authentication)/actions'
 import { toast } from 'sonner'
 import { redirect } from 'next/navigation'
 import { REGEXP_ONLY_DIGITS } from 'input-otp'

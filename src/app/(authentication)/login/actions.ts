@@ -43,6 +43,4 @@ export async function login(clientData: unknown) {
       message: "An unexpected error has occurred."
     };
   }
-
-  return { success: true };
 }

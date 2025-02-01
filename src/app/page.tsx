@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
-import LogoutButton from "@/components/logout-button";
+import LogoutButton from "@/components/ui/logout-button";
 
 export default async function Home() {
 

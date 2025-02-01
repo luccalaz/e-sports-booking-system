@@ -1,6 +1,9 @@
 "use client"
 
-import { Dispatch, SetStateAction } from "react"
+import { useState } from "react"
+import { VerificationForm } from "@/app/(authentication)/components/verification-form"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -9,11 +12,13 @@ import { toast } from "sonner"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from "@/components/ui/button"
-import { signup } from "@/app/signup/actions"
+import { signup } from "@/app/(authentication)/signup/actions"
 import { signupformSchema } from "@/utils/formSchemas"
 
+export default function SignupForm() {
+    const [page, setPage] = useState<number>(1);
+    const [schoolID, setSchoolID] = useState<string>("");
 
-export default function SignupForm({ setSchoolID, setPage }: { setSchoolID: Dispatch<SetStateAction<string>>, setPage: Dispatch<SetStateAction<number>> }) {
     const form = useForm<z.infer<typeof signupformSchema>>({
         resolver: zodResolver(signupformSchema),
         defaultValues: {
@@ -42,8 +47,10 @@ export default function SignupForm({ setSchoolID, setPage }: { setSchoolID: Disp
         }
     }
 
-    return (
-        <Form {...form}>
+
+    if (page == 1) {
+        return (
+            <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-6">
                 <div className="text-center">
                     <h2 className="text-2xl font-bold text-title">Create an account</h2>
@@ -96,5 +103,20 @@ export default function SignupForm({ setSchoolID, setPage }: { setSchoolID: Disp
                 </div>
             </form>
         </Form>
-    )
+        )
+    } else if (page == 2) {
+        return (
+            <VerificationForm schoolID={schoolID}/>
+        )
+    } else {
+        return (
+            <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>
+                    An unexpected error has occured.
+                </AlertDescription>
+            </Alert>
+        );
+    }
 }
