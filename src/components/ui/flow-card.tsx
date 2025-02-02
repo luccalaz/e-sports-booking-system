@@ -10,12 +10,12 @@ export default function FlowCard({ children, img }: FlowCardProps) {
   return (
     <div className="border rounded-lg overflow-hidden grid grid-cols-1 lg:grid-cols-2 w-full max-w-[478px] lg:max-w-[955px]">
       {img && (
-        <div className="lg:h-auto relative order-last lg:order-first">
+        <div className="h-[150px] lg:h-auto relative order-last lg:order-first">
           <Image
             src={img}
             alt="Card image"
             fill
-            className="object-cover object-center"
+            className="object-cover object-center -z-10"
           />
         </div>
       )}
