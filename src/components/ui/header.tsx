@@ -20,7 +20,7 @@ export default function Header({ loggedIn = false }: HeaderProps) {
                         </Link>
                     </Button>
                     <ModeToggle />
-                    <LogoutButton />
+                    {loggedIn && <LogoutButton />}
                 </div>
             </div>
         </header>

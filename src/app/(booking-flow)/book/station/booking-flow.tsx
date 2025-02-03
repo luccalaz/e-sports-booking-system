@@ -29,7 +29,7 @@ export default function StationBookingFlow() {
                 <h2 className="text-xl md:text-2xl font-bold text-title">What do you want to play?</h2>
                 <div className="text-xs md:text-sm text-zinc-500 pt-2">Select the game station you’d like to book</div>
             </div>
-            <div className="h-[320px] overflow-y-auto no-scrollbar">
+            <div className="h-[320px] overflow-y-auto">
                 <RadioGroup defaultValue="individual" className="grid grid-cols-2 gap-2" onValueChange={(value: string) => setBookingData({ ...bookingData, type: value })}>
                     {Array.from({ length: 29 }, (_, i) => (
                         <div key={i + 2}>
