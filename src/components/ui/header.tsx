@@ -10,7 +10,7 @@ interface HeaderProps {
 
 export default function Header({ loggedIn = false }: HeaderProps) {
     return (
-        <header className="sticky top-0 px-3 md:px-14 h-16 border-b bg-background">
+        <header className="sticky top-0 px-3 md:px-14 h-16 border-b bg-background z-10">
             <div className="h-full flex justify-between items-center">
                 <Logo />
                 <div className="flex gap-3">

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 import React, { useState } from 'react'
 
 export default function StationBookingFlow() {
@@ -37,22 +38,22 @@ export default function StationBookingFlow() {
                     defaultValue="individual"
                     className="grid grid-cols-2 gap-2"
                     onValueChange={(value: string) =>
-                        setBookingData({ ...bookingData, type: value })
+                        setBookingData({ ...bookingData, station: value })
                     }
                 >
-                    {Array.from({ length: 59 }, (_, i) => (
-                        <div key={i + 2}>
+                    {Array.from({ length: 20 }, (_, i) => (
+                        <div key={i + 1}>
                             <RadioGroupItem
-                                value={`station${i + 2}`}
-                                id={`station${i + 2}`}
+                                value={`station${i + 1}`}
+                                id={`station${i + 1}`}
                                 className="peer sr-only"
                             />
                             <Label
-                                htmlFor={`station${i + 2}`}
+                                htmlFor={`station${i + 1}`}
                                 className="h-10 flex flex-row items-center rounded-md border-2 p-4 border-muted bg-popover cursor-pointer select-none md:hover:bg-accent md:hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                             >
                                 <span className="flex-1 text-center">
-                                    PS5 - Station {i + 2}
+                                    PS5 - Station {i + 1}
                                 </span>
                             </Label>
                         </div>
@@ -60,12 +61,14 @@ export default function StationBookingFlow() {
                 </RadioGroup>
             </div>
             <div>
-                <Button className="w-full" disabled={!bookingData.type}>
-                    Continue ({bookingData.type})
+                <Button className="w-full" disabled={!bookingData.station}>
+                    Continue
                 </Button>
-                <Button className="w-full text-foreground" variant={"link"}>
-                    <ArrowLeft />
-                    Go back
+                <Button className="w-full text-foreground" variant={"link"} asChild>
+                    <Link href="/book">
+                        <ArrowLeft />
+                        Go back
+                    </Link>
                 </Button>
             </div>
         </div>
