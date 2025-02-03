@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { VerificationForm } from "@/app/(authentication)/components/verification-form"
+import { VerificationForm } from "@/app/(authentication)/verification-form"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -50,41 +50,41 @@ export default function LoginForm() {
     if (page == 1) {
         return (
             <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-6">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold text-title">Welcome back</h2>
-                    <div className="text-sm text-zinc-500 pt-2">Enter your school ID to login and start booking</div>
-                </div>
-                <FormField control={form.control} name="schoolID" render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>School ID</FormLabel>
-                        <FormControl>
-                            <Input placeholder="e.g W0123456" {...field} />
-                        </FormControl>
-                    </FormItem>
-                )} />
-                <div className="space-y-3">
-                    <Button 
-                        type="submit" 
-                        className="w-full" 
-                        disabled={!form.formState.isValid  || form.formState.isSubmitting}
-                        loading={form.formState.isSubmitting ? "Sending login code.." : undefined}
-                    >
-                        Send login code
-                    </Button>
-                    <div className="text-sm text-center mt-">
-                        <span>First time booking? </span>
-                        <Link href="/signup">
-                            <span className="underline">Sign up</span>
-                        </Link>
+                <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-6">
+                    <div className="text-center">
+                        <h2 className="text-2xl font-bold text-title">Welcome back</h2>
+                        <div className="text-sm text-zinc-500 pt-2">Enter your school ID to login and start booking</div>
                     </div>
-                </div>
-            </form>
-        </Form>
+                    <FormField control={form.control} name="schoolID" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>School ID</FormLabel>
+                            <FormControl>
+                                <Input placeholder="e.g W0123456" {...field} />
+                            </FormControl>
+                        </FormItem>
+                    )} />
+                    <div className="space-y-3">
+                        <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={!form.formState.isValid || form.formState.isSubmitting}
+                            loading={form.formState.isSubmitting ? "Sending login code.." : undefined}
+                        >
+                            Send login code
+                        </Button>
+                        <div className="text-sm text-center mt-">
+                            <span>First time booking? </span>
+                            <Link href="/signup">
+                                <span className="underline">Sign up</span>
+                            </Link>
+                        </div>
+                    </div>
+                </form>
+            </Form>
         )
     } else if (page == 2) {
         return (
-            <VerificationForm schoolID={schoolID}/>
+            <VerificationForm schoolID={schoolID} />
         )
     } else {
         return (
