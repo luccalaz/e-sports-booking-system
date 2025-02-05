@@ -1,12 +1,12 @@
-import { BookingFlowProps } from '@/utils/types'
+import { StationBookingFlowProps } from '@/utils/types'
 import React from 'react'
 import StepStationSelection from './step-station-selection'
 
-export default function StationBookingFlow({ bookingData, setBookingData, currentStep, nextStep, prevStep }: BookingFlowProps) {
+export default function StationBookingFlow({ bookingData, setBookingData, setImage, currentStep, nextStep, prevStep }: StationBookingFlowProps) {
     return (
         <>
             {currentStep === 2 && (
-                <StepStationSelection bookingData={bookingData} setBookingData={setBookingData} nextStep={nextStep} prevStep={prevStep} />
+                <StepStationSelection bookingData={bookingData} setBookingData={setBookingData} setImage={setImage} nextStep={nextStep} prevStep={prevStep} />
             )}
             {/* {currentStep === 3 && (
                 <StepDateSelection bookingData={bookingData} setBookingData={setBookingData} nextStep={nextStep} prevStep={prevStep} />

@@ -1,12 +1,15 @@
+"use client"
 import BookingFlow from "@/components/booking-flow/booking-flow";
 import FlowCard from "@/components/ui/flow-card";
+import { useState } from "react";
 
-export default async function Home() {
+export default function Home() {
+    const [image, setImage] = useState<string>("")
 
     return (
         <>
-            <FlowCard img='/images/lounge.jpg'>
-                <BookingFlow />
+            <FlowCard img={image ? `/images/stations/${image}` : `/images/lounge.jpg`}>
+                <BookingFlow setImage={setImage} />
             </FlowCard>
             <div className="text-center">
                 <div className="text-xs md:text-sm text-center text-zinc-500 max-w-[476px] lg:max-w-full">

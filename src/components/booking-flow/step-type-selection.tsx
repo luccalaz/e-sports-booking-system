@@ -3,9 +3,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { User, Users } from 'lucide-react'
-import { BookingFlowStepProps } from '@/utils/types'
+import { LoungeBookingFlowStepProps } from '@/utils/types'
 
-export default function StepTypeSelection({ bookingData, setBookingData, nextStep, prevStep }: BookingFlowStepProps) {
+export default function StepTypeSelection({ bookingData, setBookingData, nextStep, prevStep }: LoungeBookingFlowStepProps) {
 
     return (
         <div className="flex flex-col gap-6 justify-between max-h-[468px] lg:h-[468px]">

@@ -3,18 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { createClient } from "@/utils/supabase/client";
-import { BookingFlowStepProps, Station } from "@/utils/types";
+import { StationBookingFlowStepProps, Station } from "@/utils/types";
 import { ArrowLeft } from "lucide-react";
 import LoadingOverlay from "@/components/ui/loading-overlay";
 
-export default function StepStationSelection({ bookingData, setBookingData, nextStep, prevStep }: BookingFlowStepProps) {
+export default function StepStationSelection({ bookingData, setBookingData, setImage, nextStep, prevStep }: StationBookingFlowStepProps) {
     const [stations, setStations] = useState<Station[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const supabase = createClient();
         async function fetchStations() {
-            const { data, error } = await supabase.from("stations").select().eq("status", "available");
+            const { data, error } = await supabase.from("stations").select().eq("status", "available").order("id", { ascending: true });
             if (!error && data.length > 0) {
                 setStations(data);
                 setLoading(false);
@@ -41,9 +41,9 @@ export default function StepStationSelection({ bookingData, setBookingData, next
                     <RadioGroup
                         defaultValue={bookingData.stationId}
                         className="grid grid-cols-1 sm:grid-cols-2 gap-2"
-                        onValueChange={(value: string) => {
-                            setBookingData({ ...bookingData, stationId: value });
-
+                        onValueChange={(stationId: string) => {
+                            setBookingData({ ...bookingData, stationId: stationId });
+                            setImage(stations.find(station => station.id === stationId)?.img || "");
                         }}
                     >
                         {stations.map((station) => (
@@ -75,6 +75,7 @@ export default function StepStationSelection({ bookingData, setBookingData, next
                     variant={"link"}
                     onClick={() => {
                         setBookingData({ ...bookingData, stationId: undefined });
+                        setImage("");
                         prevStep();
                     }}
                 >

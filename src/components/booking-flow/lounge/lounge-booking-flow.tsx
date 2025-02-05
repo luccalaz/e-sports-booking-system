@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui/button'
-import { BookingFlowProps } from '@/utils/types'
+import { LoungeBookingFlowProps } from '@/utils/types'
 import { ArrowLeft } from 'lucide-react'
 import React from 'react'
 
-export default function LoungeBookingFlow({ bookingData, setBookingData, currentStep, nextStep, prevStep }: BookingFlowProps) {
+export default function LoungeBookingFlow({ bookingData, setBookingData, currentStep, nextStep, prevStep }: LoungeBookingFlowProps) {
     return (
         <>
             {currentStep === 2 && (

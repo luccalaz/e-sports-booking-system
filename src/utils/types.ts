@@ -12,7 +12,16 @@ export interface LoginFormData {
     schoolID: string;
 }
 
-export interface BookingFlowProps {
+export interface StationBookingFlowProps {
+    bookingData: BookingData,
+    setBookingData: React.Dispatch<React.SetStateAction<BookingData>>,
+    setImage: React.Dispatch<React.SetStateAction<string>>,
+    currentStep: number,
+    nextStep: () => void,
+    prevStep: () => void
+}
+
+export interface LoungeBookingFlowProps {
     bookingData: BookingData,
     setBookingData: React.Dispatch<React.SetStateAction<BookingData>>,
     currentStep: number,
@@ -20,7 +29,15 @@ export interface BookingFlowProps {
     prevStep: () => void
 }
 
-export interface BookingFlowStepProps {
+export interface StationBookingFlowStepProps {
+    bookingData: BookingData,
+    setBookingData: React.Dispatch<React.SetStateAction<BookingData>>,
+    setImage: React.Dispatch<React.SetStateAction<string>>,
+    nextStep: () => void,
+    prevStep: () => void
+}
+
+export interface LoungeBookingFlowStepProps {
     bookingData: BookingData,
     setBookingData: React.Dispatch<React.SetStateAction<BookingData>>,
     nextStep: () => void,
@@ -42,5 +59,5 @@ export interface Station {
     id: string,
     name: string,
     status: string,
-    imgUrl: string
+    img: string
 }

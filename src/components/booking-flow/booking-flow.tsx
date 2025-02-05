@@ -6,7 +6,7 @@ import StationBookingFlow from "./station/station-booking-flow";
 import LoungeBookingFlow from "./lounge/lounge-booking-flow";
 import { BookingData } from "@/utils/types";
 
-export default function BookingFlow() {
+export default function BookingFlow({ setImage }: { setImage: React.Dispatch<React.SetStateAction<string>> }) {
     const [currentStep, setCurrentStep] = useState<number>(1);
     const [bookingData, setBookingData] = useState<BookingData>({
         userId: '',
@@ -33,6 +33,7 @@ export default function BookingFlow() {
             {/* Load Station Booking Flow */}
             {bookingData.type === "station" && currentStep > 1 && (
                 <StationBookingFlow
+                    setImage={setImage}
                     bookingData={bookingData}
                     setBookingData={setBookingData}
                     currentStep={currentStep}
