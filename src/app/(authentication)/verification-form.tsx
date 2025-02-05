@@ -10,8 +10,11 @@ import { toast } from 'sonner'
 import { redirect } from 'next/navigation'
 import { REGEXP_ONLY_DIGITS } from 'input-otp'
 import { otpformSchema } from '@/utils/formSchemas'
+import { useState } from 'react'
 
 export function VerificationForm({ schoolID }: { schoolID: string }) {
+    const [loading, setLoading] = useState<boolean>(false);
+
     const otpform = useForm<z.infer<typeof otpformSchema>>({
         resolver: zodResolver(otpformSchema),
         defaultValues: {
@@ -20,9 +23,11 @@ export function VerificationForm({ schoolID }: { schoolID: string }) {
     })
 
     async function onSubmitOtp(values: z.infer<typeof otpformSchema>) {
+        setLoading(true);
         const error = await verifyotp(schoolID, values);
 
         if (error) {
+            setLoading(false);
             return toast.error(error.message);
         }
 
@@ -64,8 +69,8 @@ export function VerificationForm({ schoolID }: { schoolID: string }) {
                 <Button
                     type="submit"
                     className="w-full"
-                    disabled={!otpform.formState.isValid || otpform.formState.isSubmitting}
-                    loading={otpform.formState.isSubmitting ? "Logging in..." : undefined}
+                    disabled={!otpform.formState.isValid || loading}
+                    loading={loading ? "Logging in..." : undefined}
                 >
                     Login
                 </Button>
