@@ -1,6 +1,7 @@
 import { StationBookingFlowProps } from '@/utils/types'
 import React from 'react'
 import StepStationSelection from './step-station-selection'
+import StepStationDateSelection from './step-date-selection'
 
 export default function StationBookingFlow({ bookingData, setBookingData, setImage, currentStep, nextStep, prevStep }: StationBookingFlowProps) {
     return (
@@ -8,12 +9,9 @@ export default function StationBookingFlow({ bookingData, setBookingData, setIma
             {currentStep === 2 && (
                 <StepStationSelection bookingData={bookingData} setBookingData={setBookingData} setImage={setImage} nextStep={nextStep} prevStep={prevStep} />
             )}
-            {/* {currentStep === 3 && (
-                <StepDateSelection bookingData={bookingData} setBookingData={setBookingData} nextStep={nextStep} prevStep={prevStep} />
+            {currentStep === 3 && (
+                <StepStationDateSelection bookingData={bookingData} setBookingData={setBookingData} setImage={setImage} nextStep={nextStep} prevStep={prevStep} />
             )}
-            {currentStep === 4 && (
-                <StepConfirmBooking bookingData={bookingData} setBookingData={setBookingData} nextStep={nextStep} prevStep={prevStep} />
-            )} */}
         </>
     )
 }

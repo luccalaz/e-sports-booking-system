@@ -48,11 +48,11 @@ export interface BookingData {
     userId: string,
     stationId?: string,
     type: string,
-    datetime: Date,
-    duration: number,
+    datetime?: Date,
+    duration?: number,
     name?: string,
     description?: string,
-    status: string
+    status?: string
 }
 
 export interface Station {

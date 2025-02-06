@@ -81,3 +81,7 @@
 ::-webkit-scrollbar-thumb {
   @apply rounded-full bg-border border-[1px] border-transparent border-solid bg-clip-padding;
 }
+
+.scrollbar-gutter {
+  scrollbar-gutter: stable;
+}

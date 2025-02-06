@@ -12,7 +12,7 @@ export default function BookingFlow({ setImage }: { setImage: React.Dispatch<Rea
         userId: '',
         stationId: '',
         type: 'station',
-        datetime: new Date(),
+        datetime: undefined,
         duration: 0,
         name: '',
         description: '',
@@ -25,7 +25,7 @@ export default function BookingFlow({ setImage }: { setImage: React.Dispatch<Rea
     return (
         <>
             {currentStep === 1 && (
-                <div className="flex flex-col gap-6 justify-between lg:h-[468px]">
+                <div className="flex flex-col gap-6 justify-between lg:h-[472px]">
                     <StepTypeSelection bookingData={bookingData} setBookingData={setBookingData} nextStep={nextStep} prevStep={prevStep} />
                 </div>
             )}

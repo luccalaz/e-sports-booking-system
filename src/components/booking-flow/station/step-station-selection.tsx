@@ -6,25 +6,30 @@ import { createClient } from "@/utils/supabase/client";
 import { StationBookingFlowStepProps, Station } from "@/utils/types";
 import { ArrowLeft } from "lucide-react";
 import LoadingOverlay from "@/components/ui/loading-overlay";
+import { toast } from "sonner";
+import ErrorOverlay from "@/components/ui/error-overlay";
 
 export default function StepStationSelection({ bookingData, setBookingData, setImage, nextStep, prevStep }: StationBookingFlowStepProps) {
     const [stations, setStations] = useState<Station[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<boolean>();
 
     useEffect(() => {
         const supabase = createClient();
         async function fetchStations() {
             const { data, error } = await supabase.from("stations").select().eq("status", "available").order("id", { ascending: true });
+            setLoading(false);
             if (!error && data.length > 0) {
                 setStations(data);
-                setLoading(false);
+            } else {
+                setError(true);
             }
         }
         fetchStations();
     }, []);
 
     return (
-        <div className="flex flex-col gap-6 justify-between h-[468px] lg:h-[468px]">
+        <div className="flex flex-col gap-6 justify-between h-[472px] lg:h-[472px]">
             <div className="text-center">
                 <h2 className="text-xl md:text-2xl font-bold text-title">
                     What do you want to play?
@@ -35,9 +40,7 @@ export default function StepStationSelection({ bookingData, setBookingData, setI
             </div>
             <div className="h-full overflow-y-auto relative">
                 {/* Show Loading or station list inside the list area */}
-                {loading ? (
-                    <LoadingOverlay />
-                ) : (
+                {loading ? <LoadingOverlay /> : error ? <ErrorOverlay /> : (
                     <RadioGroup
                         defaultValue={bookingData.stationId}
                         className="grid grid-cols-1 sm:grid-cols-2 gap-2"
@@ -71,7 +74,7 @@ export default function StepStationSelection({ bookingData, setBookingData, setI
                     Continue
                 </Button>
                 <Button
-                    className="w-full text-foreground"
+                    className="w-full text-foreground pb-0 pt-3 h-fit"
                     variant={"link"}
                     onClick={() => {
                         setBookingData({ ...bookingData, stationId: undefined });
