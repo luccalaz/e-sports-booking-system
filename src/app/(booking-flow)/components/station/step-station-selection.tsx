@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { createClient } from "@/utils/supabase/client";
-import { StationBookingFlowStepProps, Station } from "@/utils/types";
+import { StationBookingFlowStepProps, Station } from "@/lib/types";
 import { ArrowLeft } from "lucide-react";
 import LoadingOverlay from "@/components/ui/loading-overlay";
 import { toast } from "sonner";

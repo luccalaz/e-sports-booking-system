@@ -1,20 +1,19 @@
 "use client"
 
-import { useState } from "react"
-import { VerificationForm } from "@/app/(authentication)/verification-form"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertCircle } from "lucide-react"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import Link from "next/link"
-import { toast } from "sonner"
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { login } from "@/app/(authentication)/login/actions"
-import { loginformSchema } from "@/utils/formSchemas"
-import { redirect } from "next/navigation"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { VerificationForm } from "@/app/(authentication)/components/verification-form";
+import { loginformSchema } from "@/lib/formSchemas";
+import { login } from "../actions";
+
 
 export default function LoginForm() {
     const [page, setPage] = useState<number>(1);
@@ -82,19 +81,11 @@ export default function LoginForm() {
                 </form>
             </Form>
         )
-    } else if (page == 2) {
+    }
+
+    if (page == 2) {
         return (
             <VerificationForm schoolID={schoolID} />
         )
-    } else {
-        return (
-            <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>
-                    An unexpected error has occured.
-                </AlertDescription>
-            </Alert>
-        );
     }
 }

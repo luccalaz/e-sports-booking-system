@@ -1,16 +1,17 @@
-import { Form, FormControl, FormField, FormItem } from '@/components/ui/form'
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
-import { Button } from '@/components/ui/button'
-import { useForm } from "react-hook-form"
-import { Mail } from 'lucide-react'
-import { z } from 'zod'
-import { zodResolver } from "@hookform/resolvers/zod"
-import { verifyotp } from '@/app/(authentication)/actions'
-import { toast } from 'sonner'
-import { redirect } from 'next/navigation'
-import { REGEXP_ONLY_DIGITS } from 'input-otp'
-import { otpformSchema } from '@/utils/formSchemas'
-import { useState } from 'react'
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { redirect } from "next/navigation";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { Mail } from "lucide-react";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { verifyotp } from "@/app/(authentication)/actions";
+import { otpformSchema } from "@/lib/formSchemas";
+
 
 export function VerificationForm({ schoolID }: { schoolID: string }) {
     const [loading, setLoading] = useState<boolean>(false);

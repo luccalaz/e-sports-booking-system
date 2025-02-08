@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { LoungeBookingFlowProps } from '@/utils/types'
+import { LoungeBookingFlowProps } from '@/lib/types'
 import { ArrowLeft } from 'lucide-react'
 import React from 'react'
 

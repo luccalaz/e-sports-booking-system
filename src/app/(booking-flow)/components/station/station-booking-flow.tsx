@@ -1,4 +1,4 @@
-import { StationBookingFlowProps } from '@/utils/types'
+import { StationBookingFlowProps } from '@/lib/types'
 import React from 'react'
 import StepStationSelection from './step-station-selection'
 import StepStationDateSelection from './step-date-selection'

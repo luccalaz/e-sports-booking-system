@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { StationBookingFlowStepProps } from "@/utils/types";
+import { StationBookingFlowStepProps } from "@/lib/types";
 import { ArrowLeft } from "lucide-react";
 import LoadingOverlay from "@/components/ui/loading-overlay";
 import { Calendar } from "@/components/ui/calendar";
@@ -8,7 +8,7 @@ import ErrorOverlay from "@/components/ui/error-overlay";
 
 export default function StepStationDateSelection({ bookingData, setBookingData, setImage, nextStep, prevStep }: StationBookingFlowStepProps) {
     const [unavailableDates, setUnavailableDates] = useState<Date[] | undefined>();
-    const [loading, setLoading] = useState<boolean>(true);
+    const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
 
     useEffect(() => {

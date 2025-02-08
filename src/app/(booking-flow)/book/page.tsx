@@ -1,6 +1,7 @@
 "use client"
-import BookingFlow from "@/components/booking-flow/booking-flow";
+
 import FlowCard from "@/components/ui/flow-card";
+import BookingFlow from "../components/booking-flow";
 import { useState } from "react";
 
 export default function Home() {
