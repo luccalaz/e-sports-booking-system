@@ -19,12 +19,12 @@ export async function getUnavailableDates(stationId?: string) {
 
     // fetch all relevant bookings in the booking timeframe
     const futureDays = addDays(startOfDay(now), BOOKING_TIMEFRAME);
-    let { data: bookings, error } = await supabase.from("bookings").select().lte("start_timestamp", futureDays.toISOString());
-    if (error || !bookings) {
+    const { data, error } = await supabase.from("bookings").select().lte("start_timestamp", futureDays.toISOString());
+    if (error || !data) {
         return null;
     }
 
-    bookings = bookings.map((b: any) => ({
+    const bookings = data.map((b: Booking) => ({
         ...b,
         start_timestamp: new Date(b.start_timestamp),
         end_timestamp: new Date(b.end_timestamp),
@@ -48,7 +48,7 @@ export async function getUnavailableDates(stationId?: string) {
             }
 
             let dayStart = parseTimeStringToDate(currentDay, station.availability[weekday].open);
-            let dayEnd = parseTimeStringToDate(currentDay, station.availability[weekday].close)
+            const dayEnd = parseTimeStringToDate(currentDay, station.availability[weekday].close)
 
             // if currentDay is today (i === 0), start from current time (now)
             if (i === 0 && now > dayStart) {
