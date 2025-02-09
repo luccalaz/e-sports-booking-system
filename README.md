@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# E-Sports Lounge Booking System
 
-## Getting Started
+## Overview
+The **E-Sports Lounge Booking System** is a web application designed to facilitate the reservation and management of gaming stations in the NSCC Truro Campus E-Sports Lounge. The system allows students and staff to book gaming stations or the full lounge for events, track availability, manage their reservations, and provides an admin dashboard for lounge managers to oversee operations efficiently.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### User Features
+- **User Registration & Authentication**: Secure sign-up and login with OTP e-mail authentication to verify college account.
+- **Booking Flow**: An interactive booking flow that guides users through the booking process according to their choices and needs.
+- **Booking View**: View past and upcoming reservations and cancel upcoming reservations before their session starts.
+- **Notifications & Reminders**: Email notifications for upcoming reservations with custom alert times.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Admin Features
+- **Dashboard Bookings**: View, select, filter and manage upcoming bookings.
+- **Station Management**: Add, update, remove, or temporarily block gaming stations and change their availability.
+- **User Management**: View, suspend, promote, or delete user accounts if necessary.
+- **Role & Permission Management**: Add, remove and update roles and set specific dashboard permissions.
+- **Reports & Analytics**: View statistics on lounge usage, popular time slots, and game preferences.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Possible Future Enhancements
+- **Live Availability Updates**: Real-time tracking of gaming station availability (webhooks).
+- **QR Code Check-In**: Users scan a QR code upon arrival for verification.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
+- **Frontend**: React.js and Next.js
+- **Backend**: Next.js, Supabase (PostgreSQL)
+- **Deployment**: Self-hosted on NSCC’s infrastructure. Preview on Vercel.
 
-## Learn More
+## License
+This project is licensed under the MIT License.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Contact
+For questions, reach out via email [luccalazza@gmail.com](mailto:luccalazza@gmail.com).
