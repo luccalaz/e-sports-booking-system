@@ -6,7 +6,6 @@ import { createClient } from "@/utils/supabase/client";
 import { StationBookingFlowStepProps, Station } from "@/lib/types";
 import { ArrowLeft } from "lucide-react";
 import LoadingOverlay from "@/components/ui/loading-overlay";
-import { toast } from "sonner";
 import ErrorOverlay from "@/components/ui/error-overlay";
 
 export default function StepStationSelection({ bookingData, setBookingData, setImage, nextStep, prevStep }: StationBookingFlowStepProps) {
@@ -19,11 +18,11 @@ export default function StepStationSelection({ bookingData, setBookingData, setI
         async function fetchStations() {
             const { data, error } = await supabase.from("stations").select().eq("status", "available").order("id", { ascending: true });
             setLoading(false);
-            if (!error && data.length > 0) {
-                setStations(data);
-            } else {
-                setError(true);
+            if (error || data.length < 1) {
+                return setError(true);
             }
+
+            setStations(data);
         }
         fetchStations();
     }, []);
@@ -43,7 +42,7 @@ export default function StepStationSelection({ bookingData, setBookingData, setI
                 {loading ? <LoadingOverlay /> : error ? <ErrorOverlay /> : (
                     <RadioGroup
                         defaultValue={bookingData.stationId}
-                        className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+                        className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-1"
                         onValueChange={(stationId: string) => {
                             setBookingData({ ...bookingData, stationId: stationId });
                             setImage(stations.find(station => station.id === stationId)?.img || "");

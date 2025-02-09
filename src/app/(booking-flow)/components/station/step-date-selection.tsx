@@ -5,15 +5,21 @@ import { ArrowLeft } from "lucide-react";
 import LoadingOverlay from "@/components/ui/loading-overlay";
 import { Calendar } from "@/components/ui/calendar";
 import ErrorOverlay from "@/components/ui/error-overlay";
+import { getUnavailableDates } from "../../actions";
 
 export default function StepStationDateSelection({ bookingData, setBookingData, setImage, nextStep, prevStep }: StationBookingFlowStepProps) {
     const [unavailableDates, setUnavailableDates] = useState<Date[] | undefined>();
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
 
     useEffect(() => {
         async function fetchDates() {
-            setUnavailableDates([]);
+            const response = await getUnavailableDates(bookingData.stationId);
+            if (!response) {
+                return setError(true);
+            }
+            setUnavailableDates(response);
+            setLoading(false);
         };
         fetchDates();
     }, []);
@@ -33,36 +39,45 @@ export default function StepStationDateSelection({ bookingData, setBookingData, 
                 {loading ? <LoadingOverlay /> : error ? <ErrorOverlay /> : (
                     <Calendar
                         mode="single"
-                        selected={bookingData.datetime}
+                        selected={bookingData.start_timestamp}
                         disabled={(date) => {
-                            const now = new Date();
-                            now.setHours(0, 0, 0, 0); // Reset time to start of day
-                            const thirtyDaysFromNow = new Date(now);
-                            thirtyDaysFromNow.setDate(now.getDate() + 30);
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+
+                            const lastAllowed = new Date(today);
+                            lastAllowed.setDate(lastAllowed.getDate() + 29);
+
+                            // Disable if date is outside [today..today+29] or in unavailableDates
                             return (
-                                date < now ||
-                                date > thirtyDaysFromNow ||
-                                (unavailableDates?.some(
-                                    (unavailable) => unavailable.getTime() === date.getTime()
-                                ) ?? false)
+                                date < today ||
+                                date > lastAllowed ||
+                                unavailableDates!.some((u) =>
+                                    u.getFullYear() === date.getFullYear() &&
+                                    u.getMonth() === date.getMonth() &&
+                                    u.getDate() === date.getDate()
+                                )
                             );
                         }}
                         fromMonth={new Date()}
                         toMonth={new Date(new Date().setMonth(new Date().getMonth() + 1))}
-                        onSelect={(date) => setBookingData({ ...bookingData, datetime: date })}
+                        onSelect={(selectedDate) => {
+                            setBookingData({ ...bookingData, start_timestamp: selectedDate });
+                            console.log(selectedDate);
+                        }}
                         className="border"
                     />
+
                 )}
             </div>
             <div>
-                <Button className="w-full" disabled={!bookingData.datetime} onClick={nextStep}>
+                <Button className="w-full" disabled={!bookingData.start_timestamp} onClick={nextStep}>
                     Continue
                 </Button>
                 <Button
                     className="w-full text-foreground pb-0 pt-3 h-fit"
                     variant={"link"}
                     onClick={() => {
-                        setBookingData({ ...bookingData, stationId: undefined, datetime: undefined });
+                        setBookingData({ ...bookingData, stationId: undefined, start_timestamp: undefined });
                         setImage("");
                         prevStep();
                     }}

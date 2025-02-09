@@ -17,8 +17,8 @@ export default function BookingFlow({ setImage }: { setImage: React.Dispatch<Rea
         userId: '',
         stationId: '',
         type: 'station',
-        datetime: undefined,
-        duration: 0,
+        start_timestamp: undefined,
+        end_timestamp: undefined,
         name: '',
         description: '',
         status: ''
@@ -94,8 +94,6 @@ export default function BookingFlow({ setImage }: { setImage: React.Dispatch<Rea
                     />
                 ) : null
             )}
-
-
 
             {/* Show Lounge Booking Flow */}
             {bookingData.type === "lounge" && currentStep > 1 && (

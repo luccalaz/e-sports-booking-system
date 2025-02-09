@@ -45,11 +45,11 @@ export interface LoungeBookingFlowStepProps {
 }
 
 export interface BookingData {
-    userId: string,
+    userId?: string,
     stationId?: string,
-    type: string,
-    datetime?: Date,
-    duration?: number,
+    type?: string,
+    start_timestamp?: Date,
+    end_timestamp?: Date,
     name?: string,
     description?: string,
     status?: string
@@ -58,6 +58,11 @@ export interface BookingData {
 export interface Station {
     id: string,
     name: string,
-    status: string,
+    availability: JSON,
     img: string
+}
+
+export interface Booking {
+    start_timestamp: Date,
+    end_timestamp: Date,
 }
