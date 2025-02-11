@@ -9,6 +9,7 @@ import { BookingData } from "@/lib/types";
 import LoungeBookingFlow from "./lounge/lounge-booking-flow";
 import StepStationDateSelection from "./station/step-date-selection";
 import StepStationSelection from "./station/step-station-selection";
+import StepStationTimeSelection from "./station/step-time-selection";
 
 
 export default function BookingFlow({ setImage }: { setImage: React.Dispatch<React.SetStateAction<string>> }) {
@@ -86,6 +87,14 @@ export default function BookingFlow({ setImage }: { setImage: React.Dispatch<Rea
                     />
                 ) : currentStep === 3 ? (
                     <StepStationDateSelection
+                        bookingData={bookingData}
+                        setBookingData={setBookingData}
+                        setImage={setImage}
+                        nextStep={nextStep}
+                        prevStep={prevStep}
+                    />
+                ) : currentStep === 4 ? (
+                    <StepStationTimeSelection
                         bookingData={bookingData}
                         setBookingData={setBookingData}
                         setImage={setImage}

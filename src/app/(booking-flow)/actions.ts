@@ -72,6 +72,107 @@ export async function getUnavailableDates(stationId?: string) {
     return unavailableDates;
 }
 
+export async function getAvailableTimes(date: Date, stationId?: string): Promise<Date[] | null> {
+    const supabase = await createClient();
+    const availableSlots: Date[] = [];
+    const currentDay = startOfDay(date);
+    const weekday = currentDay.getDay(); // 0=Sun, 6=Sat
+    const now = new Date();
+
+    // if stationId is passed in, get unavailable times for that station
+    const isStationBooking = !!stationId;
+
+    let dayStart: Date;
+    let dayEnd: Date;
+
+    if (isStationBooking) {
+        // get station availability
+        const { data: station, error } = await supabase.from('stations').select('availability').eq('id', stationId).single();
+        if (error || !station) {
+            return null;
+        }
+
+        dayStart = parseTimeStringToDate(currentDay, station.availability[weekday].open);
+        dayEnd = parseTimeStringToDate(currentDay, station.availability[weekday].close);
+
+        if (now > dayStart) dayStart = now;
+    } else {
+        // If no stationId is provided, return an empty array or handle as needed
+        return availableSlots;
+    }
+
+    // fetch all bookings for that date and station
+    const { data, error } = await supabase
+        .from("bookings")
+        .select()
+        .eq('station_id', stationId)
+        .gte("start_timestamp", dayStart.toISOString())
+        .lte("end_timestamp", dayEnd.toISOString());
+
+    if (error || !data) {
+        return null;
+    }
+
+    const bookings = data.map((b: Booking) => ({
+        ...b,
+        start_timestamp: new Date(b.start_timestamp),
+        end_timestamp: new Date(b.end_timestamp),
+    }));
+
+    // Each interval is 15 minutes
+    const chunkMs = 15 * 60 * 1000;
+
+    let slotStart = new Date(dayStart);
+
+    // How many consecutive 15-min chunks do we need?
+    const requiredChunks = MIN_BOOKING_DURATION / 15;
+
+    while (slotStart < dayEnd) {
+        const slotEnd = new Date(slotStart.getTime() + chunkMs);
+
+        // If the slot would go past dayEnd, we can't fit a full 15-min chunk
+        if (slotEnd > dayEnd) break;
+
+        // Check if we have enough consecutive free slots starting at this time
+        let consecutiveFree = 0;
+        let checkSlot = new Date(slotStart);
+        let isSlotAvailable = true;
+
+        while (consecutiveFree < requiredChunks) {
+            const checkEnd = new Date(checkSlot.getTime() + chunkMs);
+
+            // If checking future slots would go past dayEnd, this slot isn't viable
+            if (checkEnd > dayEnd) {
+                isSlotAvailable = false;
+                break;
+            }
+
+            // Check if this specific time slot overlaps with any booking
+            const isBlocked = bookings.some(booking =>
+                checkSlot < booking.end_timestamp &&
+                checkEnd > booking.start_timestamp
+            );
+
+            if (isBlocked) {
+                isSlotAvailable = false;
+                break;
+            }
+
+            consecutiveFree++;
+            checkSlot = checkEnd;
+        }
+
+        if (isSlotAvailable) {
+            availableSlots.push(new Date(slotStart));
+        }
+
+        // Move to the next 15-minute chunk
+        slotStart = slotEnd;
+    }
+
+    return availableSlots;
+}
+
 export async function checkAvailability(bookings: Booking[], dayStart: Date, dayEnd: Date, minDuration: number = MIN_BOOKING_DURATION) {
     // Each interval is 15 minutes
     const chunkMs = 15 * 60 * 1000;
