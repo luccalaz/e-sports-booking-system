@@ -3,10 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { createClient } from "@/utils/supabase/client";
-import { StationBookingFlowStepProps, Station } from "@/lib/types";
+import { Station, BookingData } from "@/lib/types";
 import { ArrowLeft } from "lucide-react";
 import LoadingOverlay from "@/components/ui/loading-overlay";
 import ErrorOverlay from "@/components/ui/error-overlay";
+
+export interface StationBookingFlowStepProps {
+    bookingData: BookingData,
+    setBookingData: React.Dispatch<React.SetStateAction<BookingData>>,
+    setImage: React.Dispatch<React.SetStateAction<string>>,
+    nextStep: () => void,
+    prevStep: () => void
+}
 
 export default function StepStationSelection({ bookingData, setBookingData, setImage, nextStep, prevStep }: StationBookingFlowStepProps) {
     const [stations, setStations] = useState<Station[]>([]);

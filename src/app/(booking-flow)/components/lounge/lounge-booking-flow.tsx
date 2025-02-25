@@ -1,7 +1,15 @@
 import { Button } from '@/components/ui/button'
-import { LoungeBookingFlowProps } from '@/lib/types'
+import { BookingData } from '@/lib/types'
 import { ArrowLeft } from 'lucide-react'
 import React from 'react'
+
+export interface LoungeBookingFlowProps {
+    bookingData: BookingData,
+    setBookingData: React.Dispatch<React.SetStateAction<BookingData>>,
+    currentStep: number,
+    nextStep: () => void,
+    prevStep: () => void
+}
 
 export default function LoungeBookingFlow({ bookingData, setBookingData, currentStep, nextStep, prevStep }: LoungeBookingFlowProps) {
     return (

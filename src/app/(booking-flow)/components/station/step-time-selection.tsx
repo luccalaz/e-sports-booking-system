@@ -1,13 +1,21 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { StationBookingFlowStepProps } from "@/lib/types";
+import { BookingData } from "@/lib/types";
 import { ArrowLeft } from "lucide-react";
 import LoadingOverlay from "@/components/ui/loading-overlay";
 import ErrorOverlay from "@/components/ui/error-overlay";
-import { startOfDay } from "@/lib/utils";
-import { getAvailableTimes } from "../../actions";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { getAvailableTimes } from "../../actions";
+import { startOfDay } from "date-fns";
+
+export interface StationBookingFlowStepProps {
+    bookingData: BookingData,
+    setBookingData: React.Dispatch<React.SetStateAction<BookingData>>,
+    setImage: React.Dispatch<React.SetStateAction<string>>,
+    nextStep: () => void,
+    prevStep: () => void
+}
 
 export default function StepStationTimeSelection({ bookingData, setBookingData, setImage, nextStep, prevStep }: StationBookingFlowStepProps) {
     const [availableTimes, setAvailableTimes] = useState<Date[] | null>(null);
