@@ -13,7 +13,7 @@ export interface Station {
     id: string,
     name: string,
     availability: JSON,
-    img: string
+    img_url: string
 }
 
 export interface Booking {

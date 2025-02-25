@@ -1,28 +1,37 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { StationBookingFlowStepProps } from "@/lib/types";
+import { BookingData } from "@/lib/types";
 import { ArrowLeft } from "lucide-react";
 import LoadingOverlay from "@/components/ui/loading-overlay";
 import { Calendar } from "@/components/ui/calendar";
 import ErrorOverlay from "@/components/ui/error-overlay";
-import { getUnavailableDates } from "../../actions";
+import { getAvailableDates } from "../../actions";
+import { startOfDay } from "date-fns";
+
+export interface StationBookingFlowStepProps {
+    bookingData: BookingData,
+    setBookingData: React.Dispatch<React.SetStateAction<BookingData>>,
+    setImage: React.Dispatch<React.SetStateAction<string>>,
+    nextStep: () => void,
+    prevStep: () => void
+}
 
 export default function StepStationDateSelection({ bookingData, setBookingData, setImage, nextStep, prevStep }: StationBookingFlowStepProps) {
-    const [unavailableDates, setUnavailableDates] = useState<Date[] | undefined>();
+    const [availableDates, setAvailableDates] = useState<Date[] | undefined>();
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
 
     useEffect(() => {
         async function fetchDates() {
-            const response = await getUnavailableDates(bookingData.stationId);
+            const response = await getAvailableDates(bookingData.stationId);
             if (!response) {
                 return setError(true);
             }
-            setUnavailableDates(response);
+            setAvailableDates(response);
             setLoading(false);
         };
         fetchDates();
-    }, []);
+    }, [bookingData.stationId]);
 
     return (
         <div className="flex flex-col gap-6 justify-between h-[472px] lg:h-[472px]">
@@ -41,32 +50,18 @@ export default function StepStationDateSelection({ bookingData, setBookingData, 
                         mode="single"
                         selected={bookingData.start_timestamp}
                         disabled={(date) => {
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0);
-
-                            const lastAllowed = new Date(today);
-                            lastAllowed.setDate(lastAllowed.getDate() + 29);
-
-                            // Disable if date is outside [today..today+29] or in unavailableDates
-                            return (
-                                date < today ||
-                                date > lastAllowed ||
-                                unavailableDates!.some((u) =>
-                                    u.getFullYear() === date.getFullYear() &&
-                                    u.getMonth() === date.getMonth() &&
-                                    u.getDate() === date.getDate()
-                                )
+                            // Disable if date is not in availableDates
+                            return !availableDates?.some((availableDate) =>
+                                availableDate.getFullYear() === date.getFullYear() &&
+                                availableDate.getMonth() === date.getMonth() &&
+                                availableDate.getDate() === date.getDate()
                             );
                         }}
                         fromMonth={new Date()}
-                        toMonth={new Date(new Date().setMonth(new Date().getMonth() + 1))}
-                        onSelect={(selectedDate) => {
-                            setBookingData({ ...bookingData, start_timestamp: selectedDate });
-                            console.log(selectedDate);
-                        }}
+                        toMonth={availableDates ? new Date(Math.max(...availableDates.map(date => date.getTime()))) : new Date()}
+                        onSelect={(selectedDate) => setBookingData({ ...bookingData, start_timestamp: selectedDate })}
                         className="border"
                     />
-
                 )}
             </div>
             <div>

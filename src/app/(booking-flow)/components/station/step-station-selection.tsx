@@ -33,7 +33,7 @@ export default function StepStationSelection({ bookingData, setBookingData, setI
             setStations(data);
         }
         fetchStations();
-    }, []);
+    }, [bookingData.stationId, bookingData.start_timestamp]);
 
     return (
         <div className="flex flex-col gap-6 justify-between h-[472px] lg:h-[472px]">
@@ -53,7 +53,7 @@ export default function StepStationSelection({ bookingData, setBookingData, setI
                         className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-1"
                         onValueChange={(stationId: string) => {
                             setBookingData({ ...bookingData, stationId: stationId });
-                            setImage(stations.find(station => station.id === stationId)?.img || "");
+                            setImage(stations.find(station => station.id === stationId)?.img_url || "");
                         }}
                     >
                         {stations.map((station) => (
