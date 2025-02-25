@@ -6,7 +6,6 @@ import LoadingOverlay from "@/components/ui/loading-overlay";
 import ErrorOverlay from "@/components/ui/error-overlay";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { getAvailableTimes } from "../../actions";
 import { startOfDay } from "date-fns";
 
 export interface StationBookingFlowStepProps {
@@ -24,7 +23,7 @@ export default function StepStationTimeSelection({ bookingData, setBookingData, 
 
     useEffect(() => {
         async function fetchDates() {
-            setAvailableTimes(await getAvailableTimes(startOfDay(bookingData.start_timestamp!), bookingData.stationId));
+            // setAvailableTimes(await getAvailableTimes(startOfDay(bookingData.start_timestamp!), bookingData.stationId));
             setLoading(false);
         };
         fetchDates();

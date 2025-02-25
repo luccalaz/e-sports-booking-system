@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useState } from "react";
-import { LogOut } from "lucide-react";
+import { Loader2, LogOut } from "lucide-react";
 
 export default function LogoutButton() {
     const router = useRouter();
@@ -24,7 +24,7 @@ export default function LogoutButton() {
                 router.push("/login");
             },
             {
-                loading: 'Signing out...',
+                loading: 'Signing you out...',
                 success: 'Signed out successfully',
                 error: 'Error signing out. Please try again',
             }
@@ -34,12 +34,11 @@ export default function LogoutButton() {
     return (
         <Button
             onClick={logOut}
-            disabled={loading}
             variant={"outline"}
             size={"icon"}
             className="text-destructive"
         >
-            <LogOut />
+            {loading ? <Loader2 className="animate-spin text-destructive" /> : <LogOut />}
         </Button>
     )
 }
