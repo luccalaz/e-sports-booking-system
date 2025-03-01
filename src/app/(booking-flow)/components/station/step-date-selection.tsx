@@ -27,6 +27,7 @@ export default function StepStationDateSelection({ bookingData, setBookingData, 
             if (!response) {
                 return setError(true);
             }
+            console.log(response);
             setAvailableDates(response);
             setLoading(false);
         };

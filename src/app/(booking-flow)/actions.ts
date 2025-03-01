@@ -10,7 +10,6 @@ import {
     tzStartOfDay
 } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/server";
-import { time } from "console";
 import { addDays } from "date-fns";
 // Import date-fns-tz functions
 import { toZonedTime } from "date-fns-tz";
@@ -32,6 +31,10 @@ export async function getAvailableDates(timezone: string, stationId?: string): P
     // Compute the start of day in the client's timezone as a UTC Date
     const startDate = await tzStartOfDay(localNow, timezone);
 
+    console.log("Timezone: ", timezone)
+    console.log("Local now:", localNow);
+    console.log("Start date:", startDate);
+
     // Fetch booking settings
     const { data: settingsRows, error: settingsError } = await supabase
         .from("settings")
@@ -47,6 +50,7 @@ export async function getAvailableDates(timezone: string, stationId?: string): P
         return [];
     }
     const settingsMap = parseSettings(settingsRows);
+    console.log("Settings:", settingsMap)
 
     // Delegate to the appropriate branch.
     return stationId
@@ -178,6 +182,7 @@ async function getStationAvailableDates(
 
     // Parse and merge station-specific availability over global availability.
     const availability = parseAvailability(stationAvailabilityData ?? [], globalAvailabilityData);
+    console.log("Availability:", availability)
 
     // Fetch approved lounge bookings (affecting all stations).
     const { data: loungeBookingsData, error: loungeBookingsError } = await supabase
@@ -205,6 +210,7 @@ async function getStationAvailableDates(
         start_timestamp: new Date(b.start_timestamp),
         end_timestamp: new Date(b.end_timestamp)
     }));
+    console.log("Bookings:", bookings)
 
     // For each day in the range, check for an available slot.
     for (let i = 0; i < maxDaysAdvance; i++) {
@@ -214,6 +220,11 @@ async function getStationAvailableDates(
 
         let dayStart = parseTimeStringToDate(currentDate, availability[weekday].open, timezone);
         const dayEnd = parseTimeStringToDate(currentDate, availability[weekday].close, timezone);
+
+        console.log("------------")
+        console.log("Current date:", currentDate)
+        console.log("Current weekday:", weekday)
+
         if (i === 0 && localNow > dayStart) {
             dayStart = roundUp15(localNow);
             if (localNow > dayEnd) continue;
@@ -222,6 +233,10 @@ async function getStationAvailableDates(
         if (isSlotAvailable) {
             availableDates.push(currentDate);
         }
+
+        console.log("Day start:", dayStart)
+        console.log("Day end:", dayEnd);
+        console.log("Available:", isSlotAvailable);
     }
     return availableDates;
 }
