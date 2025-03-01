@@ -11,6 +11,7 @@ import StepStationDateSelection from "./station/step-date-selection";
 import StepStationSelection from "./station/step-station-selection";
 import StepStationTimeSelection from "./station/step-time-selection";
 
+export const clientTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export default function BookingFlow({ setImage }: { setImage: React.Dispatch<React.SetStateAction<string>> }) {
     const [currentStep, setCurrentStep] = useState<number>(1); // keep track of current step/page

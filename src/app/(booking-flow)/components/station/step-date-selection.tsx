@@ -6,7 +6,7 @@ import LoadingOverlay from "@/components/ui/loading-overlay";
 import { Calendar } from "@/components/ui/calendar";
 import ErrorOverlay from "@/components/ui/error-overlay";
 import { getAvailableDates } from "../../actions";
-import { startOfDay } from "date-fns";
+import { clientTz } from "../booking-flow";
 
 export interface StationBookingFlowStepProps {
     bookingData: BookingData,
@@ -23,7 +23,7 @@ export default function StepStationDateSelection({ bookingData, setBookingData, 
 
     useEffect(() => {
         async function fetchDates() {
-            const response = await getAvailableDates(bookingData.stationId);
+            const response = await getAvailableDates(clientTz, bookingData.stationId);
             if (!response) {
                 return setError(true);
             }

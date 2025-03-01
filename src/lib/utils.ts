@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Booking } from "./types";
+import { fromZonedTime, format } from "date-fns-tz"
 
 export type AvailabilityInput = {
   weekday: number;
@@ -17,6 +18,16 @@ export type SettingsRow = {
   value: string
 }
 
+/**
+ * Checks if there is an available time slot within a given time range that can accommodate a booking of specified minimum duration.
+ * 
+ * @param bookings - Array of existing bookings to check against
+ * @param dayStart - Start date/time of the range to check
+ * @param dayEnd - End date/time of the range to check
+ * @param minBookingDuration - Minimum booking duration needed (in minutes)
+ * @param stationId - Optional station ID to check availability for
+ * @returns Promise that resolves to a boolean indicating if a suitable slot is available
+ */
 export async function checkRangeSlotAvailability(bookings: Booking[], dayStart: Date, dayEnd: Date, minBookingDuration: number, stationId?: string): Promise<boolean> {
   // Each interval is 15 minutes
   const intervalMs = 15 * 60 * 1000;
@@ -61,6 +72,14 @@ export async function checkRangeSlotAvailability(bookings: Booking[], dayStart: 
   return false;
 }
 
+/**
+ * Merges two availability schedules, with the primary schedule taking precedence.
+ * Each schedule defines opening and closing times for days of the week (0-6, Sunday to Saturday).
+ * 
+ * @param primary - The primary availability schedule that takes precedence
+ * @param secondary - Optional secondary/fallback availability schedule
+ * @returns An object mapping each day of the week (0-6) to either opening/closing times or null
+ */
 export function parseAvailability(primary: AvailabilityInput[], secondary?: AvailabilityInput[]): AvailabilityOutput {
   // Helper: initialize an object with keys "0".."6" all set to null.
   const defaultAvailability: AvailabilityOutput = { "0": null, "1": null, "2": null, "3": null, "4": null, "5": null, "6": null };
@@ -91,6 +110,32 @@ export function parseAvailability(primary: AvailabilityInput[], secondary?: Avai
   return merged;
 }
 
+/**
+ * Parses a time string (from availability) and combines it with the provided date,
+ * treating the time as being in the TIMEZONE (America/Halifax). Returns a UTC Date.
+ *
+ * @param {Date} date - The date to which the time will be applied.
+ * @param {string} timeStr - The time string (e.g. "09:00:00-04"). The offset may be ignored.
+ * @param {string} timezone - The timezone of the client
+ * @returns {Date} A UTC Date representing the combined date and local time.
+ */
+export function parseTimeStringToDate(date: Date, timeStr: string, timezone: string): Date {
+  // Remove any timezone offset from the time string if present.
+  const [timePart] = timeStr.split("-");
+  // Format the date portion as YYYY-MM-DD.
+  // (Assume the availability times are stored for the America/Halifax timezone.)
+  const dateStr = format(date, "yyyy-MM-dd", { timeZone: timezone });
+  const dateTimeStr = `${dateStr} ${timePart}`;
+  // Convert the date-time string in the desired timezone to a UTC Date.
+  return fromZonedTime(dateTimeStr, timezone);
+}
+
+/**
+ * Transforms an array of settings rows into a key-value object.
+ * 
+ * @param rawSettings - An array of SettingsRow objects containing key-value pairs
+ * @returns A record object where each key from the input array maps to its corresponding value
+ */
 export function parseSettings(rawSettings: SettingsRow[]): Record<string, string> {
   return rawSettings.reduce((acc: Record<string, string>, row: SettingsRow) => {
     acc[row.key] = row.value;
@@ -98,21 +143,28 @@ export function parseSettings(rawSettings: SettingsRow[]): Record<string, string
   }, {});
 }
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+/**
+ * Returns a UTC Date corresponding to the start of the day in the given timezone.
+ *
+ * @param date - The input date.
+ * @param timeZone - The IANA time zone (e.g., "America/Halifax").
+ * @returns A Date representing the start of day in that timezone (in UTC).
+ */
+export async function tzStartOfDay(date: Date, timeZone: string): Promise<Date> {
+  // Format the date to just the date portion (YYYY-MM-DD) in the target timezone.
+  const dateStr = format(date, "yyyy-MM-dd", { timeZone });
+  // Convert that date string (which represents midnight in the target timezone)
+  // back to a UTC Date.
+  return fromZonedTime(dateStr, timeZone);
 }
 
-export function capitalizeFirstLetter(string: string) {
-  return string.replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
-export function parseTimeStringToDate(date: Date, timeStr: string): Date {
-  const parts = timeStr.split(":");
-  const hour = parseInt(parts[0], 10);
-  const minute = parseInt(parts[1] || "0", 10);
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute, 0, 0);
-}
-
+/**
+ * Rounds up a given date to the nearest 15-minute interval
+ * For example: 14:23 becomes 14:30, 14:31 becomes 14:45
+ * 
+ * @param date - The input Date object to round up
+ * @returns A new Date object rounded up to the nearest 15-minute interval
+ */
 export function roundUp15(date: Date): Date {
   const d = new Date(date);
   const minutes = d.getMinutes();
@@ -121,4 +173,17 @@ export function roundUp15(date: Date): Date {
     d.setMinutes(minutes + (15 - remainder), 0, 0);
   }
   return d;
+}
+
+/**
+ * Capitalizes the first letter of each word in a string.
+ * @param {string} string - The input string to be capitalized.
+ * @returns {string} The string with the first letter of each word capitalized.
+ */
+export function capitalizeFirstLetter(string: string) {
+  return string.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
