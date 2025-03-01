@@ -11,8 +11,6 @@ import {
 } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/server";
 import { addDays } from "date-fns";
-// Import date-fns-tz functions
-import { toZonedTime } from "date-fns-tz";
 
 /**
  * Retrieves available booking dates (adjusted to the client's timezone) for either lounge or station bookings.
@@ -26,13 +24,11 @@ import { toZonedTime } from "date-fns-tz";
 export async function getAvailableDates(timezone: string, stationId?: string): Promise<Date[]> {
     const supabase = await createClient();
     const now = new Date();
-    // Convert current UTC time to client's local time
-    const localNow = toZonedTime(now, timezone);
     // Compute the start of day in the client's timezone as a UTC Date
-    const startDate = await tzStartOfDay(localNow, timezone);
+    const startDate = await tzStartOfDay(now, timezone);
 
     console.log("Timezone: ", timezone)
-    console.log("Local now:", localNow);
+    console.log("Local now:", now);
     console.log("Start date:", startDate);
 
     // Fetch booking settings
@@ -54,8 +50,8 @@ export async function getAvailableDates(timezone: string, stationId?: string): P
 
     // Delegate to the appropriate branch.
     return stationId
-        ? await getStationAvailableDates(stationId, settingsMap, startDate, localNow, timezone)
-        : await getLoungeAvailableDates(settingsMap, startDate, localNow, timezone);
+        ? await getStationAvailableDates(stationId, settingsMap, startDate, now, timezone)
+        : await getLoungeAvailableDates(settingsMap, startDate, now, timezone);
 }
 
 /**
@@ -63,14 +59,14 @@ export async function getAvailableDates(timezone: string, stationId?: string): P
  *
  * @param {Record<string, string>} settingsMap - A map of booking settings.
  * @param {Date} startDate - The start of day (in the client's timezone) as a UTC Date.
- * @param {Date} localNow - The current time in the client's timezone.
+ * @param {Date} now - The current time in the client's timezone.
  * @param {string} timezone - The client's timezone
  * @returns {Promise<Date[]>} A promise that resolves to an array of available lounge Date objects.
  */
 async function getLoungeAvailableDates(
     settingsMap: Record<string, string>,
     startDate: Date,
-    localNow: Date,
+    now: Date,
     timezone: string
 ): Promise<Date[]> {
     const supabase = await createClient();
@@ -78,7 +74,7 @@ async function getLoungeAvailableDates(
     const availableDates: Date[] = [];
     const maxDaysAdvance = parseInt(settingsMap["lounge_max_days_in_advance"] ?? "30", 10);
     const minBookingDuration = parseInt(settingsMap["lounge_min_booking_minutes"] ?? "30", 10);
-    const endDate = addDays(localNow, maxDaysAdvance);
+    const endDate = addDays(now, maxDaysAdvance);
 
     // Fetch global lounge availability schedules.
     const { data: rawAvailability, error: availabilityError } = await supabase
@@ -120,10 +116,10 @@ async function getLoungeAvailableDates(
         let dayStart = parseTimeStringToDate(currentDate, availability[weekday].open, timezone);
         const dayEnd = parseTimeStringToDate(currentDate, availability[weekday].close, timezone);
 
-        // For today, if localNow is later than the opening time, adjust the start time.
-        if (i === 0 && localNow > dayStart) {
-            dayStart = roundUp15(localNow);
-            if (localNow >= dayEnd) continue;
+        // For today, if now is later than the opening time, adjust the start time.
+        if (i === 0 && now > dayStart) {
+            dayStart = roundUp15(now);
+            if (now >= dayEnd) continue;
         }
 
         // Check if there is at least one available slot during the day.
@@ -142,7 +138,7 @@ async function getLoungeAvailableDates(
  * @param {string} stationId - The station identifier.
  * @param {Record<string, string>} settingsMap - A map of booking settings.
  * @param {Date} startDate - The start of day in the client's timezone as a UTC Date.
- * @param {Date} localNow - The current time in the client's timezone.
+ * @param {Date} now - The current time in the client's timezone.
  * @param {string} timezone - The client's timezone
  * @returns {Promise<Date[]>} A promise that resolves to an array of available station Date objects.
  */
@@ -150,7 +146,7 @@ async function getStationAvailableDates(
     stationId: string,
     settingsMap: Record<string, string>,
     startDate: Date,
-    localNow: Date,
+    now: Date,
     timezone: string
 ): Promise<Date[]> {
     const supabase = await createClient();
@@ -158,7 +154,7 @@ async function getStationAvailableDates(
     const availableDates: Date[] = [];
     const maxDaysAdvance = parseInt(settingsMap["station_max_days_in_advance"] ?? "30", 10);
     const minBookingDuration = parseInt(settingsMap["station_min_booking_minutes"] ?? "30", 10);
-    const endDate = addDays(localNow, maxDaysAdvance);
+    const endDate = addDays(now, maxDaysAdvance);
 
     // Fetch global station availability schedules.
     const { data: globalAvailabilityData, error: globalAvailabilityError } = await supabase
@@ -225,9 +221,9 @@ async function getStationAvailableDates(
         console.log("Current date:", currentDate)
         console.log("Current weekday:", weekday)
 
-        if (i === 0 && localNow > dayStart) {
-            dayStart = roundUp15(localNow);
-            if (localNow > dayEnd) continue;
+        if (i === 0 && now > dayStart) {
+            dayStart = roundUp15(now);
+            if (now > dayEnd) continue;
         }
         const isSlotAvailable = await checkRangeSlotAvailability(bookings, dayStart, dayEnd, minBookingDuration);
         if (isSlotAvailable) {
