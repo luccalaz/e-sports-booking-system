@@ -98,7 +98,6 @@ export default function BookingFlow({ setImage }: { setImage: React.Dispatch<Rea
                     <StepStationTimeSelection
                         bookingData={bookingData}
                         setBookingData={setBookingData}
-                        setImage={setImage}
                         nextStep={nextStep}
                         prevStep={prevStep}
                     />

@@ -6,24 +6,29 @@ import LoadingOverlay from "@/components/ui/loading-overlay";
 import ErrorOverlay from "@/components/ui/error-overlay";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { startOfDay } from "date-fns";
+import { getAvailableStartTimes } from "../../actions";
+import { clientTz } from "../booking-flow";
 
 export interface StationBookingFlowStepProps {
     bookingData: BookingData,
     setBookingData: React.Dispatch<React.SetStateAction<BookingData>>,
-    setImage: React.Dispatch<React.SetStateAction<string>>,
     nextStep: () => void,
     prevStep: () => void
 }
 
-export default function StepStationTimeSelection({ bookingData, setBookingData, setImage, nextStep, prevStep }: StationBookingFlowStepProps) {
+export default function StepStationTimeSelection({ bookingData, setBookingData, nextStep, prevStep }: StationBookingFlowStepProps) {
     const [availableTimes, setAvailableTimes] = useState<Date[] | null>(null);
+    const [selectedTime, setSelectedTime] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
 
     useEffect(() => {
         async function fetchDates() {
-            // setAvailableTimes(await getAvailableTimes(startOfDay(bookingData.start_timestamp!), bookingData.stationId));
+            const response = await getAvailableStartTimes(clientTz, bookingData.start_timestamp!, bookingData.stationId);
+            if (!response) {
+                return setError(true);
+            }
+            setAvailableTimes(response);
             setLoading(false);
         };
         fetchDates();
@@ -36,7 +41,7 @@ export default function StepStationTimeSelection({ bookingData, setBookingData, 
                     What time will you be there?
                 </h2>
                 <div className="text-xs md:text-sm text-zinc-500 pt-2">
-                    Select an available time to book the station for
+                    Select an available time on {bookingData.start_timestamp?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                 </div>
             </div>
             <div className="h-full overflow-y-auto relative">
@@ -46,6 +51,7 @@ export default function StepStationTimeSelection({ bookingData, setBookingData, 
                         className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-1"
                         onValueChange={(timestamp: string) => {
                             setBookingData({ ...bookingData, start_timestamp: new Date(timestamp) });
+                            setSelectedTime(timestamp);
                         }}
                     >
                         {availableTimes?.map((time) => (
@@ -73,7 +79,7 @@ export default function StepStationTimeSelection({ bookingData, setBookingData, 
                 )}
             </div>
             <div>
-                <Button className="w-full" onClick={nextStep}>
+                <Button className="w-full" disabled={!selectedTime} onClick={nextStep}>
                     Continue
                 </Button>
                 <Button
