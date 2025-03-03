@@ -25,10 +25,9 @@ export type SettingsRow = {
  * @param dayStart - Start date/time of the range to check
  * @param dayEnd - End date/time of the range to check
  * @param minBookingDuration - Minimum booking duration needed (in minutes)
- * @param stationId - Optional station ID to check availability for
  * @returns Promise that resolves to a boolean indicating if a suitable slot is available
  */
-export async function checkRangeSlotAvailability(bookings: Booking[], dayStart: Date, dayEnd: Date, minBookingDuration: number, stationId?: string): Promise<boolean> {
+export async function checkRangeSlotAvailability(bookings: Booking[], dayStart: Date, dayEnd: Date, minBookingDuration: number): Promise<boolean> {
   // Each interval is 15 minutes
   const intervalMs = 15 * 60 * 1000;
 
@@ -81,14 +80,14 @@ export async function checkRangeSlotAvailability(bookings: Booking[], dayStart: 
  * @returns An object mapping each day of the week (0-6) to either opening/closing times or null
  */
 export function parseAvailability(primary: AvailabilityInput[], secondary?: AvailabilityInput[]): AvailabilityOutput {
-  // Helper: initialize an object with keys "0".."6" all set to null.
+  // Initialize an object with keys "0".."6" all set to null.
   const defaultAvailability: AvailabilityOutput = { "0": null, "1": null, "2": null, "3": null, "4": null, "5": null, "6": null };
 
-  // Helper: parse a raw array into an AvailabilityOutput object.
+  // Parse a raw array into an AvailabilityOutput object.
   const parseRaw = (raw: AvailabilityInput[]): AvailabilityOutput => {
     const output = { ...defaultAvailability };
     raw.forEach((item) => {
-      // Use item.day_of_week as key (converted to string).
+      // Use item.weekday as key (converted to string).
       output[String(item.weekday)] = {
         open: item.open_time,
         close: item.close_time,
@@ -112,7 +111,7 @@ export function parseAvailability(primary: AvailabilityInput[], secondary?: Avai
 
 /**
  * Parses a time string (from availability) and combines it with the provided date,
- * treating the time as being in the TIMEZONE (America/Halifax). Returns a UTC Date.
+ * treating the time as being in the timezone. Returns a UTC Date.
  *
  * @param {Date} date - The date to which the time will be applied.
  * @param {string} timeStr - The time string (e.g. "09:00:00-04"). The offset may be ignored.
@@ -144,17 +143,16 @@ export function parseSettings(rawSettings: SettingsRow[]): Record<string, string
 }
 
 /**
- * Returns a UTC Date corresponding to the start of the day in the given timezone.
+ * Returns a UTC Date representing the start of the day in the specified timezone.
+ * For example, if the client is in America/New_York and it's Feb 26,
+ * this function returns the UTC Date corresponding to Feb 26 00:00 in New York.
  *
- * @param date - The input date.
- * @param timeZone - The IANA time zone (e.g., "America/Halifax").
- * @returns A Date representing the start of day in that timezone (in UTC).
+ * @param {Date} date - The date to base the calculation on.
+ * @param {string} timeZone - The client's IANA timezone.
+ * @returns {Date} A UTC Date representing the start of that day in the given timezone.
  */
-export async function tzStartOfDay(date: Date, timeZone: string): Promise<Date> {
-  // Format the date to just the date portion (YYYY-MM-DD) in the target timezone.
+export function getStartOfDayInTimeZone(date: Date, timeZone: string): Date {
   const dateStr = format(date, "yyyy-MM-dd", { timeZone });
-  // Convert that date string (which represents midnight in the target timezone)
-  // back to a UTC Date.
   return fromZonedTime(dateStr, timeZone);
 }
 
@@ -180,7 +178,7 @@ export function roundUp15(date: Date): Date {
  * @param {string} string - The input string to be capitalized.
  * @returns {string} The string with the first letter of each word capitalized.
  */
-export function capitalizeFirstLetter(string: string) {
+export function capitalizeFirstLetter(string: string): string {
   return string.replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
