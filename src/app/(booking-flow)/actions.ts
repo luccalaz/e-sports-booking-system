@@ -346,7 +346,7 @@ export async function getAvailableStartTimes(
 
     // Determine the day's open and close times in UTC.
     // parseTimeStringToDate converts the given date and time string (interpreted in clientTimezone) into a UTC Date.
-    let dayStartUtc = parseTimeStringToDate(selectedDate, availabilityData[weekday].open, clientTimezone);
+    const dayStartUtc = parseTimeStringToDate(selectedDate, availabilityData[weekday].open, clientTimezone);
     const dayEndUtc = parseTimeStringToDate(selectedDate, availabilityData[weekday].close, clientTimezone);
 
     // Determine if the selected date is today in the client's timezone.
