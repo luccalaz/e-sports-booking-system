@@ -6,14 +6,13 @@ import LoadingOverlay from "@/components/ui/loading-overlay";
 import ErrorOverlay from "@/components/ui/error-overlay";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { clientTz } from "../booking-flow";
 import { getAvailableStartTimes } from "@/lib/utils";
 
 export interface StationBookingFlowStepProps {
     bookingData: BookingData,
     setBookingData: React.Dispatch<React.SetStateAction<BookingData>>,
-    nextStep: () => void,
-    prevStep: () => void
+    nextStep: (steps?: number) => void,
+    prevStep: (steps?: number) => void
 }
 
 export default function StepStationTimeSelection({ bookingData, setBookingData, nextStep, prevStep }: StationBookingFlowStepProps) {
@@ -23,17 +22,16 @@ export default function StepStationTimeSelection({ bookingData, setBookingData, 
     const [error, setError] = useState<boolean>(false);
 
     useEffect(() => {
-        async function fetchDates() {
+        async function fetchTimes() {
             const response = await getAvailableStartTimes(bookingData.start_timestamp!, bookingData.stationId);
             if (!response) {
                 return setError(true);
             }
-            console.log(response);
             setAvailableTimes(response);
             setLoading(false);
         };
-        fetchDates();
-    }, []);
+        fetchTimes();
+    });
 
     return (
         <div className="flex flex-col gap-6 justify-between h-[472px] lg:h-[472px]">
@@ -48,7 +46,6 @@ export default function StepStationTimeSelection({ bookingData, setBookingData, 
             <div className="h-full overflow-y-auto relative">
                 {loading ? <LoadingOverlay /> : error ? <ErrorOverlay /> : (
                     <RadioGroup
-                        defaultValue={bookingData.start_timestamp?.toISOString()}
                         className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-1"
                         onValueChange={(timestamp: string) => {
                             setBookingData({ ...bookingData, start_timestamp: new Date(timestamp) });
@@ -80,7 +77,7 @@ export default function StepStationTimeSelection({ bookingData, setBookingData, 
                 )}
             </div>
             <div>
-                <Button className="w-full" disabled={!selectedTime} onClick={nextStep}>
+                <Button className="w-full" disabled={!selectedTime} onClick={() => nextStep()}>
                     Continue
                 </Button>
                 <Button

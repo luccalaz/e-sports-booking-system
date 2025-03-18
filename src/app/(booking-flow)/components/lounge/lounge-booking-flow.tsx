@@ -1,7 +1,11 @@
-import { Button } from '@/components/ui/button'
 import { BookingData } from '@/lib/types'
-import { ArrowLeft } from 'lucide-react'
 import React from 'react'
+import StepLoungeDateSelection from './step-date-selection'
+import StepLoungeTimeSelection from './step-time-selection'
+import StepLoungeDurationSelection from './step-duration-selection'
+import StepLoungeDescription from './step-description'
+import StepLoungeConfirmation from './step-confirmation'
+import StepLoungeSuccess from './step-success'
 
 export interface LoungeBookingFlowProps {
     bookingData: BookingData,
@@ -15,35 +19,23 @@ export default function LoungeBookingFlow({ bookingData, setBookingData, current
     return (
         <>
             {currentStep === 2 && (
-                <div className="flex flex-col gap-6 justify-between h-[468px] lg:h-[468px]">
-                    <div className="text-center">
-                        <h2 className="text-xl md:text-2xl font-bold text-title">
-                            Lorem ipsum dolor sit amet?
-                        </h2>
-                        <div className="text-xs md:text-sm text-zinc-500 pt-2">
-                            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Doloremque facere, eos ad fuga.
-                        </div>
-                    </div>
-                    <div className="flex-grow overflow-y-auto relative">
-
-                    </div>
-                    <div>
-                        <Button className="w-full" disabled={true} onClick={nextStep}>
-                            Continue
-                        </Button>
-                        <Button className="w-full text-foreground" variant={"link"} onClick={prevStep}>
-                            <ArrowLeft />
-                            Go back
-                        </Button>
-                    </div>
-                </div>
+                <StepLoungeDateSelection bookingData={bookingData} setBookingData={setBookingData} nextStep={nextStep} prevStep={prevStep} />
             )}
-            {/* {currentStep === 3 && (
-                <StepDateSelection bookingData={bookingData} setBookingData={setBookingData} nextStep={nextStep} prevStep={prevStep} />
+            {currentStep === 3 && (
+                <StepLoungeTimeSelection bookingData={bookingData} setBookingData={setBookingData} nextStep={nextStep} prevStep={prevStep} />
             )}
             {currentStep === 4 && (
-                <StepConfirmBooking bookingData={bookingData} setBookingData={setBookingData} nextStep={nextStep} prevStep={prevStep} />
-            )} */}
+                <StepLoungeDurationSelection bookingData={bookingData} setBookingData={setBookingData} nextStep={nextStep} prevStep={prevStep} />
+            )}
+            {currentStep === 5 && (
+                <StepLoungeDescription bookingData={bookingData} setBookingData={setBookingData} nextStep={nextStep} prevStep={prevStep} />
+            )}
+            {currentStep === 6 && (
+                <StepLoungeConfirmation bookingData={bookingData} setBookingData={setBookingData} nextStep={nextStep} prevStep={prevStep} />
+            )}
+            {currentStep === 7 && (
+                <StepLoungeSuccess bookingData={bookingData} setBookingData={setBookingData} nextStep={nextStep} prevStep={prevStep} />
+            )}
         </>
     )
 }

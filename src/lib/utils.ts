@@ -414,6 +414,409 @@ async function getStationAvailableStartTimes(
 }
 
 /**
+ * Retrieves the available booking durations (in minutes) for a booking starting at a given time.
+ * If a stationId is provided, station durations are returned; otherwise, lounge durations.
+ */
+export async function getAvailableBookingDurations(
+  bookingStart: Date,
+  stationId?: string
+): Promise<string[]> {
+  try {
+    const supabase = createClient();
+    const weekday = bookingStart.getDay();
+
+    // Determine which settings keys to use based on booking type.
+    const settingsKeys = stationId
+      ? ["station_min_booking_minutes", "station_max_booking_minutes"]
+      : ["lounge_min_booking_minutes", "lounge_max_booking_minutes"];
+
+    // Fetch booking duration settings.
+    const { data: settingsRows, error: settingsError } = await supabase
+      .from("settings")
+      .select()
+      .in("key", settingsKeys);
+    if (settingsError || !settingsRows) {
+      throw new Error("Error fetching settings");
+    }
+    const settingsMap = parseSettings(settingsRows);
+    // Use fallback defaults if not provided (e.g. 30 and 120 for station, 15 and 120 for lounge).
+    const minBookingDuration = safeParseInt(
+      settingsMap[settingsKeys[0]],
+      stationId ? 30 : 15
+    );
+    const maxBookingDuration = safeParseInt(
+      settingsMap[settingsKeys[1]],
+      120
+    );
+
+    // Fetch the availability schedule.
+    let availabilityData: AvailabilityOutput = {};
+    if (stationId) {
+      // For station bookings, merge station-specific and global station availability.
+      const stationAvailabilityPromise = supabase
+        .from("availability_schedules")
+        .select("weekday, open_time, close_time, timezone")
+        .eq("type", "station")
+        .eq("station_id", stationId);
+      const globalAvailabilityPromise = supabase
+        .from("availability_schedules")
+        .select("weekday, open_time, close_time, timezone")
+        .eq("type", "global_station");
+      const [stationAvailabilityResponse, globalAvailabilityResponse] = await Promise.all([
+        stationAvailabilityPromise,
+        globalAvailabilityPromise,
+      ]);
+      if (globalAvailabilityResponse.error || !globalAvailabilityResponse.data) {
+        throw new Error("Error fetching global station availability");
+      }
+      availabilityData = parseAvailability(
+        stationAvailabilityResponse.data || [],
+        globalAvailabilityResponse.data
+      );
+    } else {
+      // For lounge bookings, fetch the global lounge availability.
+      const { data: loungeAvailabilityData, error: loungeAvailabilityError } = await supabase
+        .from("availability_schedules")
+        .select("weekday, open_time, close_time, timezone")
+        .eq("type", "global_lounge");
+      if (loungeAvailabilityError || !loungeAvailabilityData) {
+        throw new Error("Error fetching lounge availability");
+      }
+      availabilityData = parseAvailability(loungeAvailabilityData);
+    }
+
+    // Get the schedule for the booking day.
+    const schedule = availabilityData[String(weekday)];
+    if (!schedule) return [];
+
+    // Compute the day's start and end times based on the schedule.
+    const dayStart = parseTimeStringToDate(bookingStart, schedule.open, schedule.timezone);
+    const dayEnd = parseTimeStringToDate(bookingStart, schedule.close, schedule.timezone);
+
+    // If the booking start time is outside the day's availability, return empty.
+    if (bookingStart >= dayEnd || bookingStart < dayStart) return [];
+
+    // Fetch bookings for the day.
+    let bookings: Booking[] = [];
+    if (stationId) {
+      const loungeBookingsPromise = supabase
+        .from("lounge_bookings")
+        .select()
+        .eq("status", "approved")
+        .gte("start_timestamp", dayStart.toISOString())
+        .lte("start_timestamp", dayEnd.toISOString());
+      const stationBookingsPromise = supabase
+        .from("station_bookings")
+        .select()
+        .eq("station_id", stationId)
+        .neq("status", "cancelled")
+        .gte("start_timestamp", dayStart.toISOString())
+        .lte("start_timestamp", dayEnd.toISOString());
+      const [loungeBookingsResponse, stationBookingsResponse] = await Promise.all([
+        loungeBookingsPromise,
+        stationBookingsPromise,
+      ]);
+      if (
+        loungeBookingsResponse.error ||
+        stationBookingsResponse.error ||
+        !loungeBookingsResponse.data ||
+        !stationBookingsResponse.data
+      ) {
+        throw new Error("Error fetching bookings");
+      }
+      bookings = [...loungeBookingsResponse.data, ...stationBookingsResponse.data].map((b: Booking) => ({
+        ...b,
+        start_timestamp: new Date(b.start_timestamp),
+        end_timestamp: new Date(b.end_timestamp),
+      }));
+    } else {
+      const { data: bookingsData, error: bookingsError } = await supabase
+        .from("lounge_bookings")
+        .select()
+        .eq("status", "approved")
+        .gte("start_timestamp", dayStart.toISOString())
+        .lte("start_timestamp", dayEnd.toISOString());
+      if (bookingsError || !bookingsData) {
+        throw new Error("Error fetching lounge bookings");
+      }
+      bookings = bookingsData.map((b: Booking) => ({
+        ...b,
+        start_timestamp: new Date(b.start_timestamp),
+        end_timestamp: new Date(b.end_timestamp),
+      }));
+    }
+
+    // Iterate over candidate durations (in 15-minute increments) from min to max.
+    const availableDurations: string[] = [];
+    for (let duration = minBookingDuration; duration <= maxBookingDuration; duration += TIME_INTERVAL_MINUTES) {
+      // Compute the candidate booking's end time.
+      const candidateEnd = new Date(bookingStart.getTime() + duration * 60 * 1000);
+      // If the candidate end exceeds the day's availability, stop checking further durations.
+      if (candidateEnd > dayEnd) break;
+
+      // Check for overlapping bookings.
+      const overlaps = bookings.some((bk: Booking) => {
+        // Two intervals overlap if bookingStart < bk.end and candidateEnd > bk.start.
+        return bookingStart < bk.end_timestamp && candidateEnd > bk.start_timestamp;
+      });
+
+      if (!overlaps) {
+        availableDurations.push(String(duration));
+      }
+    }
+
+    return availableDurations;
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
+
+/**
+ * Validates if a booking can be made based on provided data, availability, settings, and existing bookings.
+ */
+export async function validateBooking(
+  start_timestamp: Date,
+  end_timestamp: Date,
+  stationId?: string
+): Promise<boolean> {
+  try {
+    // Ensure that the start is before the end.
+    if (start_timestamp >= end_timestamp) return false;
+
+    const durationMinutes = (end_timestamp.getTime() - start_timestamp.getTime()) / (60 * 1000);
+
+    // Initialize Supabase client.
+    const supabase = createClient();
+
+    // Determine settings keys and fallback defaults based on type.
+    const settingsKeys =
+      stationId
+        ? ["station_min_booking_minutes", "station_max_booking_minutes"]
+        : ["lounge_min_booking_minutes", "lounge_max_booking_minutes"];
+
+    // Fetch booking duration settings.
+    const { data: settingsRows, error: settingsError } = await supabase
+      .from("settings")
+      .select()
+      .in("key", settingsKeys);
+    if (settingsError || !settingsRows) {
+      throw new Error("Error fetching settings");
+    }
+    const settingsMap = parseSettings(settingsRows);
+    const minBookingDuration = safeParseInt(
+      settingsMap[settingsKeys[0]],
+      stationId ? 30 : 15
+    );
+    const maxBookingDuration = safeParseInt(settingsMap[settingsKeys[1]], 120);
+
+    // Check if booking duration falls within allowed range.
+    if (durationMinutes < minBookingDuration || durationMinutes > maxBookingDuration) {
+      return false;
+    }
+
+    // Get weekday from the booking's start date.
+    const weekday = start_timestamp.getDay();
+    let availabilityData: AvailabilityOutput = {};
+
+    // Fetch availability schedules based on booking type.
+    if (stationId) {
+      // For station bookings, fetch both station-specific and global station availability concurrently.
+      const stationAvailabilityPromise = supabase
+        .from("availability_schedules")
+        .select("weekday, open_time, close_time, timezone")
+        .eq("type", "station")
+        .eq("station_id", stationId);
+      const globalAvailabilityPromise = supabase
+        .from("availability_schedules")
+        .select("weekday, open_time, close_time, timezone")
+        .eq("type", "global_station");
+      const [stationAvailabilityResponse, globalAvailabilityResponse] = await Promise.all([
+        stationAvailabilityPromise,
+        globalAvailabilityPromise,
+      ]);
+      if (globalAvailabilityResponse.error || !globalAvailabilityResponse.data) {
+        throw new Error("Error fetching global station availability");
+      }
+      availabilityData = parseAvailability(
+        stationAvailabilityResponse.data || [],
+        globalAvailabilityResponse.data
+      );
+    } else {
+      // For lounge bookings, fetch global lounge availability.
+      const { data: loungeAvailabilityData, error: loungeAvailabilityError } = await supabase
+        .from("availability_schedules")
+        .select("weekday, open_time, close_time, timezone")
+        .eq("type", "global_lounge");
+      if (loungeAvailabilityError || !loungeAvailabilityData) {
+        throw new Error("Error fetching lounge availability");
+      }
+      availabilityData = parseAvailability(loungeAvailabilityData);
+    }
+
+    // Get the schedule for the booking day.
+    const schedule = availabilityData[String(weekday)];
+    if (!schedule) return false;
+
+    // Calculate the day's available window.
+    const dayStart = parseTimeStringToDate(start_timestamp, schedule.open, schedule.timezone);
+    const dayEnd = parseTimeStringToDate(start_timestamp, schedule.close, schedule.timezone);
+
+    // Verify that the booking falls entirely within the day's available time.
+    if (start_timestamp < dayStart || end_timestamp > dayEnd) return false;
+
+    // Fetch existing bookings for the day.
+    let bookings: Booking[] = [];
+    if (stationId) {
+      // For station bookings, fetch both lounge and station bookings concurrently.
+      const loungeBookingsPromise = supabase
+        .from("lounge_bookings")
+        .select()
+        .eq("status", "approved")
+        .gte("start_timestamp", dayStart.toISOString())
+        .lte("start_timestamp", dayEnd.toISOString());
+      const stationBookingsPromise = supabase
+        .from("station_bookings")
+        .select()
+        .eq("station_id", stationId)
+        .neq("status", "cancelled")
+        .gte("start_timestamp", dayStart.toISOString())
+        .lte("start_timestamp", dayEnd.toISOString());
+      const [loungeBookingsResponse, stationBookingsResponse] = await Promise.all([
+        loungeBookingsPromise,
+        stationBookingsPromise,
+      ]);
+      if (
+        loungeBookingsResponse.error ||
+        stationBookingsResponse.error ||
+        !loungeBookingsResponse.data ||
+        !stationBookingsResponse.data
+      ) {
+        throw new Error("Error fetching bookings");
+      }
+      bookings = [...loungeBookingsResponse.data, ...stationBookingsResponse.data].map((b: Booking) => ({
+        ...b,
+        start_timestamp: new Date(b.start_timestamp),
+        end_timestamp: new Date(b.end_timestamp),
+      }));
+    } else {
+      // For lounge bookings, fetch lounge bookings for the day.
+      const { data: bookingsData, error: bookingsError } = await supabase
+        .from("lounge_bookings")
+        .select()
+        .eq("status", "approved")
+        .gte("start_timestamp", dayStart.toISOString())
+        .lte("start_timestamp", dayEnd.toISOString());
+      if (bookingsError || !bookingsData) {
+        throw new Error("Error fetching lounge bookings");
+      }
+      bookings = bookingsData.map((b: Booking) => ({
+        ...b,
+        start_timestamp: new Date(b.start_timestamp),
+        end_timestamp: new Date(b.end_timestamp),
+      }));
+    }
+
+    // Check for overlapping bookings.
+    const overlaps = bookings.some((bk: Booking) => {
+      // Overlap occurs if the new booking's start is before an existing booking's end
+      // and the new booking's end is after an existing booking's start.
+      return start_timestamp < bk.end_timestamp && end_timestamp > bk.start_timestamp;
+    });
+    if (overlaps) return false;
+
+    // All validations passed.
+    return true;
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
+}
+
+/**
+ * Attempts to book a station for a user within a given time range.
+ */
+export async function bookStation(
+  userId: string,
+  stationId: string,
+  start_timestamp: Date,
+  end_timestamp: Date,
+): Promise<{ success: boolean, error?: string }> {
+  try {
+    const success = await validateBooking(start_timestamp, end_timestamp, stationId);
+    if (!success) {
+      return { success: false, error: "Booking validation failed" };
+    }
+
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("station_bookings")
+      .insert([{ booked_by: userId, station_id: stationId, start_timestamp, end_timestamp }]);
+    if (error) {
+      return { success: false, error: error?.message };
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Attempts to book the lounge for a user within a given time range.
+ */
+export async function bookLounge(
+  userId: string,
+  name: string,
+  description: string,
+  start_timestamp: Date,
+  end_timestamp: Date,
+): Promise<{ success: boolean, error?: string }> {
+  try {
+    const success = validateBooking(start_timestamp, end_timestamp);
+    if (!success) {
+      return { success: false, error: "Booking validation failed" };
+    }
+
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("lounge_bookings")
+      .insert([{ booked_by: userId, name, description, start_timestamp, end_timestamp }]);
+    if (error) {
+      return { success: false, error: error?.message };
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Formats a duration in minutes to a human-readable string.
+ */
+export function formatDuration(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  const parts: string[] = [];
+
+  if (hours > 0) {
+    parts.push(hours + (hours === 1 ? " hour" : " hours"));
+  }
+
+  if (remainingMinutes > 0) {
+    parts.push(remainingMinutes + (remainingMinutes === 1 ? " minute" : " minutes"));
+  }
+
+  // If the duration is 0 minutes, return "0 minutes"
+  if (parts.length === 0) {
+    return "0 minutes";
+  }
+
+  return parts.join(" ");
+}
+
+/**
  * Checks if there is an available time slot within a given time range that can accommodate a booking.
  */
 export async function checkRangeSlotAvailability(
@@ -519,14 +922,6 @@ export type SettingsRow = {
   key: string;
   value: string;
 };
-
-/**
- * Returns a UTC Date representing the start of the day in a given timezone.
- */
-export function getStartOfDayInTimeZone(date: Date, timeZone: string): Date {
-  const dateStr = format(date, "yyyy-MM-dd", { timeZone });
-  return fromZonedTime(dateStr, timeZone);
-}
 
 /**
  * Rounds up a given date to the next quarter-hour.

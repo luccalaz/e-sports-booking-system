@@ -1,34 +1,45 @@
 "use client"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { User, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { BookingData } from "@/lib/types";
 import LoungeBookingFlow from "./lounge/lounge-booking-flow";
-import StepStationDateSelection from "./station/step-date-selection";
-import StepStationSelection from "./station/step-station-selection";
-import StepStationTimeSelection from "./station/step-time-selection";
+import StationBookingFlow from "./station/station-booking-flow";
+import { createClient } from "@/utils/supabase/client";
 
 export const clientTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export default function BookingFlow({ setImage }: { setImage: React.Dispatch<React.SetStateAction<string>> }) {
+
     const [currentStep, setCurrentStep] = useState<number>(1); // keep track of current step/page
     const [bookingData, setBookingData] = useState<BookingData>({
         userId: '',
         stationId: '',
+        stationName: '',
         type: 'station',
         start_timestamp: undefined,
         end_timestamp: undefined,
+        duration: 0,
         name: '',
         description: '',
         status: ''
     }); // keep track of the booking data being filled out in the flow
 
     // functions for easy navigation withing the flow page components
-    const nextStep = () => setCurrentStep((prev) => prev + 1);
-    const prevStep = () => setCurrentStep((prev) => Math.max(1, prev - 1));
+    const nextStep = (steps: number = 1) => setCurrentStep((prev) => prev + steps);
+    const prevStep = (steps: number = 1) => setCurrentStep((prev) => Math.max(1, prev - steps));
+
+    useEffect(() => {
+        const supabase = createClient();
+        const fetchUser = async () => {
+            const { data } = await supabase.auth.getUser();
+            setBookingData(prev => ({ ...prev, userId: data.user?.id || "" }));
+        };
+        fetchUser();
+    }, [])
 
     return (
         <>
@@ -68,7 +79,7 @@ export default function BookingFlow({ setImage }: { setImage: React.Dispatch<Rea
                             </RadioGroup>
                         </div>
                         <div className="space-y-3">
-                            <Button className="w-full" onClick={nextStep}>
+                            <Button className="w-full" onClick={() => nextStep()}>
                                 Continue
                             </Button>
                         </div>
@@ -78,30 +89,14 @@ export default function BookingFlow({ setImage }: { setImage: React.Dispatch<Rea
 
             {/* Show Station Booking Flow */}
             {bookingData.type === "station" && currentStep > 1 && (
-                currentStep === 2 ? (
-                    <StepStationSelection
-                        bookingData={bookingData}
-                        setBookingData={setBookingData}
-                        setImage={setImage}
-                        nextStep={nextStep}
-                        prevStep={prevStep}
-                    />
-                ) : currentStep === 3 ? (
-                    <StepStationDateSelection
-                        bookingData={bookingData}
-                        setBookingData={setBookingData}
-                        setImage={setImage}
-                        nextStep={nextStep}
-                        prevStep={prevStep}
-                    />
-                ) : currentStep === 4 ? (
-                    <StepStationTimeSelection
-                        bookingData={bookingData}
-                        setBookingData={setBookingData}
-                        nextStep={nextStep}
-                        prevStep={prevStep}
-                    />
-                ) : null
+                <StationBookingFlow
+                    bookingData={bookingData}
+                    setBookingData={setBookingData}
+                    setImage={setImage}
+                    currentStep={currentStep}
+                    nextStep={nextStep}
+                    prevStep={prevStep}
+                />
             )}
 
             {/* Show Lounge Booking Flow */}

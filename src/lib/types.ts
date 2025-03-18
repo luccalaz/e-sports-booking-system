@@ -1,9 +1,11 @@
 export interface BookingData {
     userId?: string,
     stationId?: string,
+    stationName?: string,
     type?: string,
     start_timestamp?: Date,
     end_timestamp?: Date,
+    duration?: number,
     name?: string,
     description?: string,
     status?: string
