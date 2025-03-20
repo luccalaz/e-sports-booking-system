@@ -18,7 +18,7 @@ export default function StepLoungeDescription({ bookingData, setBookingData, nex
         <div className="flex flex-col gap-6 justify-between h-[472px] lg:h-[472px]">
             <div className="text-center">
                 <h2 className="text-xl md:text-2xl font-bold text-title">
-                    What's your event about?
+                    What’s your event about?
                 </h2>
                 <div className="text-xs md:text-sm text-zinc-500 pt-2">
                     Give us some context about what your event is

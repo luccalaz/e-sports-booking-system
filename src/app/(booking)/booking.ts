@@ -173,7 +173,7 @@ export async function bookStation(
     stationId: string,
     start_timestamp: Date,
     end_timestamp: Date,
-): Promise<{ success: boolean, error?: string }> {
+): Promise<{ success: boolean, error?: unknown }> {
     try {
         const success = await validateBooking(start_timestamp, end_timestamp, stationId);
         if (!success) {
@@ -189,8 +189,9 @@ export async function bookStation(
         }
 
         return { success: true };
-    } catch (err: any) {
-        return { success: false, error: err.message };
+    } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        return { success: false, error: errorMessage };
     }
 }
 
@@ -219,8 +220,9 @@ export async function bookLounge(
         }
 
         return { success: true };
-    } catch (err: any) {
-        return { success: false, error: err.message };
+    } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        return { success: false, error: errorMessage };
     }
 }
 

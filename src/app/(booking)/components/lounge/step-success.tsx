@@ -18,7 +18,7 @@ export default function StepLoungeSuccess({ bookingData, setBookingData, nextSte
             <div className="flex flex-col items-center justify-center text-title">
                 <CircleCheckBig className="w-10 h-10" />
                 <h2 className="text-xl md:text-2xl font-bold mt-1">
-                    You're all set!
+                    You’re all set!
                 </h2>
                 <div className="text-xs md:text-sm text-zinc-500 pt-2">
                     You will receive an email if your request is approved

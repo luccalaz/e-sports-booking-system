@@ -20,7 +20,7 @@ export default function StepStationSuccess({ bookingData, setBookingData, nextSt
             <div className="flex flex-col items-center justify-center text-title mt-2">
                 <CircleCheckBig className="w-10 h-10" />
                 <h2 className="text-xl md:text-2xl font-bold mt-1">
-                    You're all set!
+                    You’re all set!
                 </h2>
                 <div className="text-xs md:text-sm text-zinc-500 pt-2">
                     Your booking has been successfully confirmed
