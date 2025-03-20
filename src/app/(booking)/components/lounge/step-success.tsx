@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { BookingData } from "@/lib/types";
 import { formatDuration } from "@/lib/utils";
 import { Calendar, CircleCheckBig, Clock, Tag, TextCursorInput, Timer, Users } from "lucide-react";
+import Link from "next/link";
 
 export interface LoungeBookingFlowStepProps {
     bookingData: BookingData,
@@ -64,7 +65,7 @@ export default function StepLoungeSuccess({ bookingData, setBookingData, nextSte
                 className="w-full"
                 asChild
             >
-                <a href="/bookings">View my bookings</a>
+                <Link href="/bookings">View my bookings</Link>
             </Button>
         </div>
     );

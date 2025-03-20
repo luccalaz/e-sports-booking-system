@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { BookingData } from "@/lib/types";
-import { bookStation, formatDuration } from "@/lib/utils";
-import { ArrowLeft, Calendar, Clock, Gamepad2, Timer } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
+import { formatDuration } from "@/lib/utils";
+import { Calendar, CircleCheckBig, Clock, Gamepad2, Timer } from "lucide-react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export interface StationBookingFlowStepProps {
     bookingData: BookingData,
@@ -12,34 +12,22 @@ export interface StationBookingFlowStepProps {
     prevStep: (steps?: number) => void
 }
 
-export default function StepStationConfirmation({ bookingData, setBookingData, nextStep, prevStep }: StationBookingFlowStepProps) {
-    const [loading, setLoading] = useState<boolean>(false);
-
-    const confirmBooking = async () => {
-        setLoading(true);
-        const response = await bookStation(bookingData.userId!, bookingData.stationId!, bookingData.start_timestamp!, bookingData.end_timestamp!);
-        if (response.success) {
-            toast.success("Booking confirmed! 🎉");
-            nextStep();
-        } else {
-            setBookingData({ ...bookingData, start_timestamp: undefined, end_timestamp: undefined });
-            prevStep(3);
-            toast.error("The booking is no longer available. Please select a different date or time.");
-        }
-    }
+export default function StepStationSuccess({ bookingData, setBookingData, nextStep, prevStep }: StationBookingFlowStepProps) {
+    const router = useRouter();
 
     return (
         <div className="flex flex-col gap-6 justify-between lg:h-[472px]">
-            <div className="text-center">
-                <h2 className="text-xl md:text-2xl font-bold text-title">
-                    Does everything look right?
+            <div className="flex flex-col items-center justify-center text-title mt-2">
+                <CircleCheckBig className="w-10 h-10" />
+                <h2 className="text-xl md:text-2xl font-bold mt-1">
+                    You're all set!
                 </h2>
                 <div className="text-xs md:text-sm text-zinc-500 pt-2">
-                    Review your booking details to ensure it is correct
+                    Your booking has been successfully confirmed
                 </div>
             </div>
-            <div className="h-full overflow-y-auto relative">
-                <div className="border-2 p-4 space-y-4 text-sm">
+            <div className="flex flex-col items-center gap-6 h-full overflow-y-auto relative">
+                <div className="border-2 p-4 space-y-4 text-sm w-full">
                     <div className="flex items-center gap-2">
                         <Gamepad2 className="w-[18px] h-[18px] text-zinc-500" />
                         <div className="text-zinc-500 flex-grow">Station</div>
@@ -61,26 +49,23 @@ export default function StepStationConfirmation({ bookingData, setBookingData, n
                         <div>{formatDuration(bookingData.duration!)}</div>
                     </div>
                 </div>
+                <div className="text-xs md:text-sm text-zinc-500">
+                    A confirmation email has been sent to you
+                </div>
             </div>
             <div>
                 <Button
                     className="w-full"
-                    disabled={loading}
-                    loading={loading ? "" : undefined}
-                    onClick={confirmBooking}
+                    asChild
                 >
-                    Confirm & book
+                    <a href="/book">Book something else</a>
                 </Button>
                 <Button
                     className="w-full text-foreground pb-0 pt-3 h-fit"
                     variant={"link"}
-                    disabled={loading}
-                    onClick={() => {
-                        prevStep();
-                    }}
+                    asChild
                 >
-                    <ArrowLeft />
-                    Go back
+                    <Link href="/bookings">View my bookings</Link>
                 </Button>
             </div>
         </div>

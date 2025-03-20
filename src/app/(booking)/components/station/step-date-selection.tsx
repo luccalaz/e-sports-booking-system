@@ -5,23 +5,24 @@ import { ArrowLeft } from "lucide-react";
 import LoadingOverlay from "@/components/ui/loading-overlay";
 import { Calendar } from "@/components/ui/calendar";
 import ErrorOverlay from "@/components/ui/error-overlay";
-import { getAvailableDates } from "@/lib/utils";
+import { getAvailableDates } from "../../booking";
 
-export interface LoungeBookingFlowStepProps {
+export interface StationBookingFlowStepProps {
     bookingData: BookingData,
     setBookingData: React.Dispatch<React.SetStateAction<BookingData>>,
+    setImage: React.Dispatch<React.SetStateAction<string>>,
     nextStep: (steps?: number) => void,
     prevStep: (steps?: number) => void
 }
 
-export default function StepLoungeDateSelection({ bookingData, setBookingData, nextStep, prevStep }: LoungeBookingFlowStepProps) {
+export default function StepStationDateSelection({ bookingData, setBookingData, setImage, nextStep, prevStep }: StationBookingFlowStepProps) {
     const [availableDates, setAvailableDates] = useState<Date[] | undefined>();
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
 
     useEffect(() => {
         async function fetchDates() {
-            const response = await getAvailableDates();
+            const response = await getAvailableDates(bookingData.stationId);
             if (!response) {
                 return setError(true);
             }
@@ -35,10 +36,10 @@ export default function StepLoungeDateSelection({ bookingData, setBookingData, n
         <div className="flex flex-col gap-6 justify-between h-[472px] lg:h-[472px]">
             <div className="text-center">
                 <h2 className="text-xl md:text-2xl font-bold text-title">
-                    When is your event?
+                    When do you want to play?
                 </h2>
                 <div className="text-xs md:text-sm text-zinc-500 pt-2">
-                    Select the date you want to book the lounge for
+                    Select the date you want to book this station for
                 </div>
             </div>
             <div className="flex-grow overflow-y-hidden flex justify-center relative">
@@ -69,7 +70,8 @@ export default function StepLoungeDateSelection({ bookingData, setBookingData, n
                     className="w-full text-foreground pb-0 pt-3 h-fit"
                     variant={"link"}
                     onClick={() => {
-                        setBookingData({ ...bookingData, start_timestamp: undefined });
+                        setBookingData({ ...bookingData, stationId: undefined, start_timestamp: undefined });
+                        setImage("");
                         prevStep();
                     }}
                 >

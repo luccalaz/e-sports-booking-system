@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { BookingData } from "@/lib/types";
-import { bookLounge, formatDuration } from "@/lib/utils";
+import { formatDuration } from "@/lib/utils";
 import { ArrowLeft, Calendar, Clock, Gamepad2, TextCursorInput, Timer, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { bookLounge } from "../../booking";
 
 export interface LoungeBookingFlowStepProps {
     bookingData: BookingData,
