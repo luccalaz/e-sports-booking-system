@@ -52,6 +52,7 @@ export default {
 					'5': 'hsl(var(--chart-5))'
 				},
 				warning: 'hsl(var(--warning))',
+				success: 'hsl(var(--success))'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

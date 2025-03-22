@@ -54,7 +54,7 @@ export default function StepLoungeSuccess({ bookingData, setBookingData, nextSte
                     <div className="flex items-center gap-2">
                         <Tag className="w-[18px] h-[18px] text-zinc-500" />
                         <div className="text-zinc-500 flex-grow">Status</div>
-                        <Badge variant={"outline"} className="bg-warning">Pending approval</Badge>
+                        <Badge variant={"warning"}>Pending approval</Badge>
                     </div>
                 </div>
                 <div className="text-xs md:text-sm text-center text-zinc-500">

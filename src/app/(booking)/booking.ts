@@ -1,5 +1,5 @@
 import { DEFAULT_MAX_DAYS_ADVANCE, TIME_INTERVAL_MINUTES, TIME_INTERVAL_MS } from "@/lib/consts";
-import { Booking } from "@/lib/types";
+import { Booking, LoungeBooking, StationBooking, UserBooking } from "@/lib/types";
 import { AvailabilityOutput, getDateRange, parseAvailability, parseSettings, parseTimeStringToDate, roundUpToNextQuarterHour, safeParseInt } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { addDays } from "date-fns";
@@ -226,6 +226,88 @@ export async function bookLounge(
     }
 }
 
+/**
+ * Determines the display status for a booking based on its type, db status, and current time.
+ */
+function getDisplayStatus(
+    booking: Booking
+): { status: string, badge: string } {
+    const now = new Date();
+
+    if (booking.station) {
+        if (booking.status === "cancelled") return { status: "Cancelled", badge: "destructive" };
+        if (booking.status === "noshow") return { status: "No-show", badge: "warning" };
+        if (booking.status === "confirmed") {
+            if (now < booking.start_timestamp) return { status: "Upcoming", badge: "default" };
+            if (now >= booking.start_timestamp && now < booking.end_timestamp) return { status: "In-progress", badge: "outline" };
+            if (now >= booking.end_timestamp) return { status: "Ended", badge: "outline" };
+        }
+        return { status: booking.status, badge: "default" };
+    } else {
+        if (booking.status === "cancelled") return { status: "Cancelled", badge: "destructive" };
+        if (booking.status === "denied") return { status: "Denied", badge: "destructive" };
+        if (booking.status === "pending") return { status: "Pending approval", badge: "warning" };
+        if (booking.status === "approved") {
+            if (now < booking.start_timestamp) return { status: "Confirmed", badge: "default" };
+            if (now >= booking.start_timestamp && now < booking.end_timestamp) return { status: "In-progress", badge: "outline" };
+            if (now >= booking.end_timestamp) return { status: "Ended", badge: "outline" };
+        }
+        return { status: booking.status, badge: "default" };
+    }
+}
+
+/**
+ * Fetches the user's bookings, splits them into upcoming and past bookings, and adds display status
+ */
+export async function getMyBookings(userId: string): Promise<UserBooking[]> {
+    try {
+        const supabase = createClient();
+        const now = new Date();
+
+        // Fetch station bookings (including a joined station detail) for the user.
+        const { data: stationBookings, error: stationBookingsError } = await supabase
+            .from("station_bookings")
+            .select("*, station:station_id(name, img_url)")
+            .eq("booked_by", userId);
+
+        // Fetch lounge bookings for the user.
+        const { data: loungeBookings, error: loungeBookingsError } = await supabase
+            .from("lounge_bookings")
+            .select()
+            .eq("booked_by", userId);
+
+        if (stationBookingsError || loungeBookingsError) {
+            throw new Error("Error fetching bookings");
+        }
+
+        // Process station bookings.
+        const processedBookings: UserBooking[] = [...stationBookings, ...loungeBookings].map((booking: Booking) => {
+            const start_timestamp = new Date(booking.start_timestamp);
+            const end_timestamp = new Date(booking.end_timestamp);
+            const display = getDisplayStatus({ ...booking, start_timestamp, end_timestamp });
+            const duration = (end_timestamp.getTime() - start_timestamp.getTime()) / (60 * 1000);
+            return {
+                ...booking,
+                display: { ...display, date_status: (end_timestamp >= now ? "upcoming" : "past") },
+                start_timestamp,
+                end_timestamp,
+                duration,
+            };
+        });
+
+        return processedBookings;
+    } catch (err) {
+        console.error(err);
+        return [];
+    }
+}
+
+
+// /**
+//  * Returns permission for booking
+//  */
+// export async function getBookingPermissions(userId: string, bookingId: string): {
+// }
 
 /**
  * Retrieves available booking dates for either lounge or station bookings.

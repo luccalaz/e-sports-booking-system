@@ -9,7 +9,7 @@ export default function Home() {
 
     return (
         <>
-            <FlowCard img={image ? `/images/stations/${image}` : `/images/lounge.jpg`}>
+            <FlowCard img={image || "/images/lounge.jpg"}>
                 <BookingFlow setImage={setImage} />
             </FlowCard>
             <div className="text-center">
