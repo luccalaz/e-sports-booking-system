@@ -20,7 +20,7 @@ export default function StepLoungeDescription({ bookingData, setBookingData, nex
                 <h2 className="text-xl md:text-2xl font-bold text-title">
                     What’s your event about?
                 </h2>
-                <div className="text-xs md:text-sm text-zinc-500 pt-2">
+                <div className="text-sm text-zinc-500 pt-2">
                     Give us some context about what your event is
                 </div>
             </div>

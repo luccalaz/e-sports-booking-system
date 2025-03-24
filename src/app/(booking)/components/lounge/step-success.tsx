@@ -57,9 +57,9 @@ export default function StepLoungeSuccess({ bookingData, setBookingData, nextSte
                         <Badge variant={"warning"}>Pending approval</Badge>
                     </div>
                 </div>
-                <div className="text-xs md:text-sm text-center text-zinc-500">
+                {/* <div className="text-sm text-center text-zinc-500">
                     A confirmation email has been sent to you
-                </div>
+                </div> */}
             </div>
             <Button
                 className="w-full"

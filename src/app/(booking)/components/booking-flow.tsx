@@ -49,7 +49,7 @@ export default function BookingFlow({ setImage }: { setImage: React.Dispatch<Rea
                     <div className="flex flex-col gap-6 justify-between max-h-[468px] lg:h-[468px]">
                         <div className="text-center">
                             <h2 className="text-xl md:text-2xl font-bold text-title">What are you booking for?</h2>
-                            <div className="text-xs md:text-sm text-zinc-500 pt-2">Select the option that better matches your case</div>
+                            <div className="text-sm text-zinc-500 pt-2">Select the option that better matches your case</div>
                         </div>
                         <div className="flex-grow">
                             <RadioGroup

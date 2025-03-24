@@ -39,7 +39,7 @@ export default function StepLoungeTimeSelection({ bookingData, setBookingData, n
                 <h2 className="text-xl md:text-2xl font-bold text-title">
                     What time will your event start?
                 </h2>
-                <div className="text-xs md:text-sm text-zinc-500 pt-2">
+                <div className="text-sm text-zinc-500 pt-2">
                     Select the starting time for your booking
                 </div>
             </div>

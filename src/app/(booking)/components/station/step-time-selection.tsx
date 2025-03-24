@@ -39,7 +39,7 @@ export default function StepStationTimeSelection({ bookingData, setBookingData, 
                 <h2 className="text-xl md:text-2xl font-bold text-title">
                     What time will you be there?
                 </h2>
-                <div className="text-xs md:text-sm text-zinc-500 pt-2">
+                <div className="text-sm text-zinc-500 pt-2">
                     Select an available time on {bookingData.start_timestamp?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                 </div>
             </div>

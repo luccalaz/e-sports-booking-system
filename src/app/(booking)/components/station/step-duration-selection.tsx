@@ -40,7 +40,7 @@ export default function StepStationDurationSelection({ bookingData, setBookingDa
                 <h2 className="text-xl md:text-2xl font-bold text-title">
                     How long will you be there for?
                 </h2>
-                <div className="text-xs md:text-sm text-zinc-500 pt-2">
+                <div className="text-sm text-zinc-500 pt-2">
                     Select a duration for {bookingData.start_timestamp?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} at {bookingData.start_timestamp?.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' })}
                 </div>
             </div>

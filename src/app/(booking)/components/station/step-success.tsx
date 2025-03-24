@@ -22,7 +22,7 @@ export default function StepStationSuccess({ bookingData, setBookingData, nextSt
                 <h2 className="text-xl md:text-2xl font-bold mt-1">
                     You’re all set!
                 </h2>
-                <div className="text-xs md:text-sm text-zinc-500 pt-2">
+                <div className="text-sm text-zinc-500 pt-2">
                     Your booking has been successfully confirmed
                 </div>
             </div>
@@ -49,9 +49,9 @@ export default function StepStationSuccess({ bookingData, setBookingData, nextSt
                         <div>{formatDuration(bookingData.duration!)}</div>
                     </div>
                 </div>
-                <div className="text-xs md:text-sm text-zinc-500">
+                {/* <div className="text-xs md:text-sm text-zinc-500">
                     A confirmation email has been sent to you
-                </div>
+                </div> */}
             </div>
             <div>
                 <Button

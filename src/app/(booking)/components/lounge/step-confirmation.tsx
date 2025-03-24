@@ -35,7 +35,7 @@ export default function StepLoungeConfirmation({ bookingData, setBookingData, ne
                 <h2 className="text-xl md:text-2xl font-bold text-title">
                     Does everything look right?
                 </h2>
-                <div className="text-xs md:text-sm text-zinc-500 pt-2">
+                <div className="text-sm text-zinc-500 pt-2">
                     Review your booking details to ensure it is correct
                 </div>
             </div>
