@@ -27,11 +27,11 @@ export default function StepLoungeDescription({ bookingData, setBookingData, nex
             <div className="flex flex-col gap-5 h-full relative">
                 <div className="space-y-1">
                     <Label htmlFor="name">Event name</Label>
-                    <Input type="text" placeholder="e.g Game Night" id="name" maxLength={100} onChange={(e) => setBookingData({ ...bookingData, name: e.target.value })} />
+                    <Input type="text" placeholder="e.g Game Night" id="name" maxLength={30} value={bookingData.name} onChange={(e) => setBookingData({ ...bookingData, name: e.target.value })} />
                 </div>
                 <div className="space-y-1">
                     <Label htmlFor="name">Event description</Label>
-                    <Textarea id="description" maxLength={300} placeholder="Tell us a bit about your event" rows={6} onChange={(e) => setBookingData({ ...bookingData, description: e.target.value })} />
+                    <Textarea id="description" maxLength={300} placeholder="Tell us a bit about your event" rows={6} value={bookingData.description} onChange={(e) => setBookingData({ ...bookingData, description: e.target.value })} />
                     <div className="text-xs md:text-sm text-zinc-500 mt-1">
                         Make sure to include any special requests.
                     </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -21,19 +21,17 @@ export default function StepStationSelection({ bookingData, setBookingData, setI
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>();
 
-    useEffect(() => {
+    async function fetchStations() {
         const supabase = createClient();
-        async function fetchStations() {
-            const { data, error } = await supabase.from("stations").select().eq("status", "available").order("id", { ascending: true });
-            setLoading(false);
-            if (error || data.length < 1) {
-                return setError(true);
-            }
-
-            setStations(data);
+        const { data, error } = await supabase.from("stations").select().eq("status", "available").order("id", { ascending: true });
+        setLoading(false);
+        if (error || data.length < 1) {
+            return setError(true);
         }
-        fetchStations();
-    }, []);
+
+        setStations(data);
+    }
+    fetchStations();
 
     return (
         <div className="flex flex-col gap-6 justify-between h-[472px] lg:h-[472px]">

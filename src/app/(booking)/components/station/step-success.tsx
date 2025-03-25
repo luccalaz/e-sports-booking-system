@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { BookingData } from "@/lib/types";
 import { formatDuration } from "@/lib/utils";
 import { Calendar, CircleCheckBig, Clock, Gamepad2, Timer } from "lucide-react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export interface StationBookingFlowStepProps {
@@ -13,7 +12,6 @@ export interface StationBookingFlowStepProps {
 }
 
 export default function StepStationSuccess({ bookingData, setBookingData, nextStep, prevStep }: StationBookingFlowStepProps) {
-    const router = useRouter();
 
     return (
         <div className="flex flex-col gap-6 justify-between lg:h-[472px]">

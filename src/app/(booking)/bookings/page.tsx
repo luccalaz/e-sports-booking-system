@@ -64,7 +64,7 @@ export default function Bookings() {
                                                         {booking.station?.name || booking.name}
                                                     </div>
                                                     <Badge
-                                                        className="h-5"
+                                                        className="h-5 text-nowrap"
                                                         variant={
                                                             booking.display.badge as "default" | "destructive" | "outline" | "secondary" | "warning" | "success"
                                                         }

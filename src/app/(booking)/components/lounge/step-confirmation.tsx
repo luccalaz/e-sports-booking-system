@@ -20,7 +20,7 @@ export default function StepLoungeConfirmation({ bookingData, setBookingData, ne
         setLoading(true);
         const response = await bookLounge(bookingData.userId!, bookingData.name!, bookingData.description!, bookingData.start_timestamp!, bookingData.end_timestamp!);
         if (response.success) {
-            toast.success("Booking confirmed! 🎉");
+            toast.success("Booking requested! 🎉");
             nextStep();
         } else {
             setBookingData({ ...bookingData, start_timestamp: undefined, end_timestamp: undefined });

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BookingData } from "@/lib/types";
 import { ArrowLeft } from "lucide-react";
@@ -20,17 +20,15 @@ export default function StepStationDateSelection({ bookingData, setBookingData, 
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
 
-    useEffect(() => {
-        async function fetchDates() {
-            const response = await getAvailableDates(bookingData.stationId);
-            if (!response) {
-                return setError(true);
-            }
-            setAvailableDates(response);
-            setLoading(false);
-        };
-        fetchDates();
-    }, [bookingData.stationId]);
+    async function fetchDates() {
+        const response = await getAvailableDates(bookingData.stationId);
+        if (!response) {
+            return setError(true);
+        }
+        setAvailableDates(response);
+        setLoading(false);
+    };
+    fetchDates();
 
     return (
         <div className="flex flex-col gap-6 justify-between h-[472px] lg:h-[472px]">
