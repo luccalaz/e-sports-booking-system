@@ -16,6 +16,10 @@ export async function validateBooking(
         // Ensure that the start is before the end.
         if (start_timestamp >= end_timestamp) return false;
 
+        // Ensure that the booking start time is strictly in the future.
+        const now = new Date();
+        if (start_timestamp.getTime() <= now.getTime()) return false;
+
         const durationMinutes = (end_timestamp.getTime() - start_timestamp.getTime()) / (60 * 1000);
 
         // Initialize Supabase client.
@@ -206,7 +210,7 @@ export async function bookLounge(
     end_timestamp: Date,
 ): Promise<{ success: boolean, error?: string }> {
     try {
-        const success = validateBooking(start_timestamp, end_timestamp);
+        const success = await validateBooking(start_timestamp, end_timestamp);
         if (!success) {
             return { success: false, error: "Booking validation failed" };
         }

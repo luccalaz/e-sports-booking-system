@@ -24,7 +24,7 @@ export default function StepLoungeConfirmation({ bookingData, setBookingData, ne
             nextStep();
         } else {
             setBookingData({ ...bookingData, start_timestamp: undefined, end_timestamp: undefined });
-            prevStep(3);
+            prevStep(4);
             toast.error("The booking is no longer available. Please select a different date or time.");
         }
     }

@@ -125,7 +125,9 @@ export function roundUpToNextQuarterHour(date: Date): Date {
   const d = new Date(date);
   const minutes = d.getMinutes();
   const remainder = minutes % TIME_INTERVAL_MINUTES;
-  if (remainder !== 0) {
+  if (remainder === 0) {
+    d.setMinutes(minutes + TIME_INTERVAL_MINUTES, 0, 0);
+  } else {
     d.setMinutes(minutes + (TIME_INTERVAL_MINUTES - remainder), 0, 0);
   }
   return d;
