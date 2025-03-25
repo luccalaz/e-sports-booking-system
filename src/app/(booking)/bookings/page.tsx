@@ -29,7 +29,7 @@ export default function Bookings() {
         };
 
         fetchBookings();
-    });
+    }, [supabase.auth]);
 
     return (
         <Card className="w-full max-w-4xl relative">

@@ -33,7 +33,7 @@ export default function StepStationSelection({ bookingData, setBookingData, setI
             setStations(data);
         }
         fetchStations();
-    });
+    }, []);
 
     return (
         <div className="flex flex-col gap-6 justify-between h-[472px] lg:h-[472px]">

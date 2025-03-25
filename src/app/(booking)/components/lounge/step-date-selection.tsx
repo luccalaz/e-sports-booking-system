@@ -29,7 +29,7 @@ export default function StepLoungeDateSelection({ bookingData, setBookingData, n
             setLoading(false);
         };
         fetchDates();
-    });
+    }, []);
 
     return (
         <div className="flex flex-col gap-6 justify-between h-[472px] lg:h-[472px]">

@@ -1,5 +1,5 @@
 import { DEFAULT_MAX_DAYS_ADVANCE, TIME_INTERVAL_MINUTES, TIME_INTERVAL_MS } from "@/lib/consts";
-import { Booking, LoungeBooking, StationBooking, UserBooking } from "@/lib/types";
+import { Booking, UserBooking } from "@/lib/types";
 import { AvailabilityOutput, getDateRange, parseAvailability, parseSettings, parseTimeStringToDate, roundUpToNextQuarterHour, safeParseInt } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { addDays } from "date-fns";
@@ -224,6 +224,10 @@ export async function bookLounge(
         const errorMessage = err instanceof Error ? err.message : String(err);
         return { success: false, error: errorMessage };
     }
+}
+
+export async function cancelBooking(booking_id: string) {
+
 }
 
 /**

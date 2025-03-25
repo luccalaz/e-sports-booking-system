@@ -32,7 +32,7 @@ export default function StepStationDurationSelection({ bookingData, setBookingDa
             setLoading(false);
         };
         fetchDurations();
-    });
+    }, [bookingData.start_timestamp, bookingData.stationId]);
 
     return (
         <div className="flex flex-col gap-6 justify-between h-[472px] lg:h-[472px]">
