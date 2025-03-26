@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { BookingData } from "@/lib/types";
 import { formatDuration } from "@/lib/utils";
-import { ArrowLeft, Calendar, Clock, Gamepad2, TextCursorInput, Timer, Users } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, TextCursorInput, Timer, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { bookLounge } from "../../booking";
@@ -18,7 +18,7 @@ export default function StepLoungeConfirmation({ bookingData, setBookingData, ne
 
     const confirmBooking = async () => {
         setLoading(true);
-        const response = await bookLounge(bookingData.userId!, bookingData.name!, bookingData.description!, bookingData.start_timestamp!, bookingData.end_timestamp!);
+        const response = await bookLounge(bookingData.user_id!, bookingData.name!, bookingData.description!, bookingData.start_timestamp!, bookingData.end_timestamp!, bookingData.duration!);
         if (response.success) {
             toast.success("Booking requested! 🎉");
             nextStep();

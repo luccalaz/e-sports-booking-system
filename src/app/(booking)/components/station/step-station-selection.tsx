@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -21,17 +21,19 @@ export default function StepStationSelection({ bookingData, setBookingData, setI
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>();
 
-    async function fetchStations() {
-        const supabase = createClient();
-        const { data, error } = await supabase.from("stations").select().eq("status", "available").order("id", { ascending: true });
-        setLoading(false);
-        if (error || data.length < 1) {
-            return setError(true);
-        }
+    useEffect(() => {
+        async function fetchStations() {
+            const supabase = createClient();
+            const { data, error } = await supabase.from("stations").select().eq("status", "available").order("id", { ascending: true });
+            setLoading(false);
+            if (error || data.length < 1) {
+                return setError(true);
+            }
 
-        setStations(data);
-    }
-    fetchStations();
+            setStations(data);
+        }
+        fetchStations();
+    }, [])
 
     return (
         <div className="flex flex-col gap-6 justify-between h-[472px] lg:h-[472px]">
@@ -47,11 +49,11 @@ export default function StepStationSelection({ bookingData, setBookingData, setI
                 {/* Show Loading or station list inside the list area */}
                 {loading ? <LoadingOverlay /> : error ? <ErrorOverlay /> : (
                     <RadioGroup
-                        defaultValue={bookingData.stationId}
+                        defaultValue={bookingData.station?.id}
                         className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-1"
                         onValueChange={(stationId: string) => {
                             const selectedStation = stations.find(station => station.id === stationId);
-                            setBookingData({ ...bookingData, stationId, stationName: selectedStation?.name || "" });
+                            setBookingData({ ...bookingData, station: { id: stationId, name: selectedStation?.name || "" } });
                             setImage(selectedStation?.img_url || "");
                         }}
                     >
@@ -76,14 +78,14 @@ export default function StepStationSelection({ bookingData, setBookingData, setI
                 )}
             </div>
             <div>
-                <Button className="w-full" disabled={!bookingData.stationId} onClick={() => nextStep()}>
+                <Button className="w-full" disabled={!bookingData.station?.id} onClick={() => nextStep()}>
                     Continue
                 </Button>
                 <Button
                     className="w-full text-foreground pb-0 pt-3 h-fit"
                     variant={"link"}
                     onClick={() => {
-                        setBookingData({ ...bookingData, stationId: undefined });
+                        setBookingData({ ...bookingData, station: undefined });
                         setImage("");
                         prevStep();
                     }}

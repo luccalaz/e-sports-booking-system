@@ -1,5 +1,7 @@
+"use client"
+
 import { DEFAULT_MAX_DAYS_ADVANCE, TIME_INTERVAL_MINUTES, TIME_INTERVAL_MS } from "@/lib/consts";
-import { Booking, UserBooking } from "@/lib/types";
+import { Booking } from "@/lib/types";
 import { AvailabilityOutput, getDateRange, parseAvailability, parseSettings, parseTimeStringToDate, roundUpToNextQuarterHour, safeParseInt } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { addDays } from "date-fns";
@@ -177,6 +179,7 @@ export async function bookStation(
     stationId: string,
     start_timestamp: Date,
     end_timestamp: Date,
+    duration: number
 ): Promise<{ success: boolean, error?: unknown }> {
     try {
         const success = await validateBooking(start_timestamp, end_timestamp, stationId);
@@ -187,7 +190,7 @@ export async function bookStation(
         const supabase = createClient();
         const { error } = await supabase
             .from("station_bookings")
-            .insert([{ booked_by: userId, station_id: stationId, start_timestamp, end_timestamp }]);
+            .insert([{ booked_by: userId, station_id: stationId, start_timestamp, end_timestamp, duration }]);
         if (error) {
             return { success: false, error: error?.message };
         }
@@ -208,6 +211,7 @@ export async function bookLounge(
     description: string,
     start_timestamp: Date,
     end_timestamp: Date,
+    duration: number
 ): Promise<{ success: boolean, error?: string }> {
     try {
         const success = await validateBooking(start_timestamp, end_timestamp);
@@ -218,7 +222,7 @@ export async function bookLounge(
         const supabase = createClient();
         const { error } = await supabase
             .from("lounge_bookings")
-            .insert([{ booked_by: userId, name, description, start_timestamp, end_timestamp }]);
+            .insert([{ booked_by: userId, name, description, start_timestamp, end_timestamp, duration }]);
         if (error) {
             return { success: false, error: error?.message };
         }
@@ -230,14 +234,10 @@ export async function bookLounge(
     }
 }
 
-export async function cancelBooking(booking_id: string) {
-
-}
-
 /**
  * Determines the display status for a booking based on its type, db status, and current time.
  */
-function getDisplayStatus(
+export function getDisplayStatus(
     booking: Booking
 ): { status: string, badge: string } {
     const now = new Date();
@@ -265,9 +265,39 @@ function getDisplayStatus(
 }
 
 /**
- * Fetches the user's bookings, splits them into upcoming and past bookings, and adds display status
+ * Returns which actions are allowed to be executed on a booking
  */
-export async function getMyBookings(userId: string): Promise<UserBooking[]> {
+export function getBookingActions(booking: Booking): string[] {
+    const actions: string[] = [];
+    const now = new Date();
+
+    switch (booking.status) {
+        case "pending":
+            // For pending bookings, allow approval or denial.
+            actions.push("approve", "deny", "cancel");
+            break;
+        case "approved":
+        case "confirmed":
+            // For approved/confirmed bookings, decide based on current time.
+            if (now < booking.start_timestamp) {
+                actions.push("cancel");
+            } else if (now >= booking.start_timestamp && now <= booking.end_timestamp) {
+                actions.push("end", "noshow");
+            } else if (now > booking.end_timestamp) {
+                actions.push("noshow");
+            }
+            break;
+        default:
+            break;
+    }
+
+    return actions;
+}
+
+/**
+ * Fetches the user's bookings
+ */
+export async function getUserBookings(userId: string): Promise<Booking[]> {
     try {
         const supabase = createClient();
         const now = new Date();
@@ -275,7 +305,7 @@ export async function getMyBookings(userId: string): Promise<UserBooking[]> {
         // Fetch station bookings (including a joined station detail) for the user.
         const { data: stationBookings, error: stationBookingsError } = await supabase
             .from("station_bookings")
-            .select("*, station:station_id(name, img_url)")
+            .select("*, station:station_id(id, name, img_url)")
             .eq("booked_by", userId);
 
         // Fetch lounge bookings for the user.
@@ -289,17 +319,13 @@ export async function getMyBookings(userId: string): Promise<UserBooking[]> {
         }
 
         // Process station bookings.
-        const processedBookings: UserBooking[] = [...stationBookings, ...loungeBookings].map((booking: Booking) => {
+        const processedBookings: Booking[] = [...stationBookings, ...loungeBookings].map((booking: Booking) => {
             const start_timestamp = new Date(booking.start_timestamp);
             const end_timestamp = new Date(booking.end_timestamp);
-            const display = getDisplayStatus({ ...booking, start_timestamp, end_timestamp });
-            const duration = (end_timestamp.getTime() - start_timestamp.getTime()) / (60 * 1000);
             return {
                 ...booking,
-                display: { ...display, date_status: (end_timestamp >= now ? "upcoming" : "past") },
                 start_timestamp,
                 end_timestamp,
-                duration,
             };
         });
 
@@ -309,13 +335,6 @@ export async function getMyBookings(userId: string): Promise<UserBooking[]> {
         return [];
     }
 }
-
-
-// /**
-//  * Returns permission for booking
-//  */
-// export async function getBookingPermissions(userId: string, bookingId: string): {
-// }
 
 /**
  * Retrieves available booking dates for either lounge or station bookings.

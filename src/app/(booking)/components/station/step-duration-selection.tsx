@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BookingData } from "@/lib/types";
 import { ArrowLeft } from "lucide-react";
@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { formatDuration } from "@/lib/utils";
 import { getAvailableBookingDurations } from "../../booking";
+import { addMinutes } from "date-fns";
 
 export interface StationBookingFlowStepProps {
     bookingData: BookingData,
@@ -22,15 +23,17 @@ export default function StepStationDurationSelection({ bookingData, setBookingDa
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
 
-    async function fetchDurations() {
-        const response = await getAvailableBookingDurations(bookingData.start_timestamp!, bookingData.stationId);
-        if (!response) {
-            return setError(true);
-        }
-        setAvailableDurations(response);
-        setLoading(false);
-    };
-    fetchDurations();
+    useEffect(() => {
+        async function fetchDurations() {
+            const response = await getAvailableBookingDurations(bookingData.start_timestamp!, bookingData.station?.id);
+            if (!response) {
+                return setError(true);
+            }
+            setAvailableDurations(response);
+            setLoading(false);
+        };
+        fetchDurations();
+    }, [bookingData.start_timestamp, bookingData.station?.id])
 
     return (
         <div className="flex flex-col gap-6 justify-between h-[472px] lg:h-[472px]">
@@ -47,7 +50,8 @@ export default function StepStationDurationSelection({ bookingData, setBookingDa
                     <RadioGroup
                         className="grid grid-cols-1 gap-2 pb-1"
                         onValueChange={(duration: string) => {
-                            setBookingData({ ...bookingData, end_timestamp: new Date(bookingData.start_timestamp!.getTime() + parseInt(duration) * 60 * 1000), duration: parseInt(duration) });
+
+                            setBookingData({ ...bookingData, end_timestamp: addMinutes(new Date(bookingData.start_timestamp!), parseInt(duration)), duration: parseInt(duration) });
                             setSelectedDuration(duration);
                         }}
                     >

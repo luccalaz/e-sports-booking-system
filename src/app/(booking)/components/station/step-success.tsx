@@ -29,7 +29,7 @@ export default function StepStationSuccess({ bookingData, setBookingData, nextSt
                     <div className="flex items-center gap-2">
                         <Gamepad2 className="w-[18px] h-[18px] text-zinc-500" />
                         <div className="text-zinc-500 flex-grow">Station</div>
-                        <div>{bookingData.stationName}</div>
+                        <div>{bookingData.station?.name}</div>
                     </div>
                     <div className="flex items-center gap-2">
                         <Calendar className="w-[18px] h-[18px] text-zinc-500" />

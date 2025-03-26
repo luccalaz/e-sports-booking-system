@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { formatDuration } from "@/lib/utils";
 import { getAvailableBookingDurations } from "../../booking";
+import { addMinutes } from "date-fns";
 
 export interface LoungeBookingFlowStepProps {
     bookingData: BookingData,
@@ -47,7 +48,7 @@ export default function StepLoungeDurationSelection({ bookingData, setBookingDat
                     <RadioGroup
                         className="grid grid-cols-1 gap-2 pb-1"
                         onValueChange={(duration: string) => {
-                            setBookingData({ ...bookingData, end_timestamp: new Date(bookingData.start_timestamp!.getTime() + parseInt(duration) * 60 * 1000), duration: parseInt(duration) });
+                            setBookingData({ ...bookingData, end_timestamp: addMinutes(new Date(bookingData.start_timestamp!), parseInt(duration)), duration: parseInt(duration) });
                             setSelectedDuration(duration);
                         }}
                     >

@@ -13,20 +13,8 @@ import { createClient } from "@/utils/supabase/client";
 export const clientTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export default function BookingFlow({ setImage }: { setImage: React.Dispatch<React.SetStateAction<string>> }) {
-
     const [currentStep, setCurrentStep] = useState<number>(1); // keep track of current step/page
-    const [bookingData, setBookingData] = useState<BookingData>({
-        userId: '',
-        stationId: '',
-        stationName: '',
-        type: 'station',
-        start_timestamp: undefined,
-        end_timestamp: undefined,
-        duration: 0,
-        name: '',
-        description: '',
-        status: ''
-    }); // keep track of the booking data being filled out in the flow
+    const [bookingData, setBookingData] = useState<BookingData>({ type: 'station', name: '', description: '' });
 
     // functions for easy navigation withing the flow page components
     const nextStep = (steps: number = 1) => setCurrentStep((prev) => prev + steps);
@@ -36,7 +24,7 @@ export default function BookingFlow({ setImage }: { setImage: React.Dispatch<Rea
         const supabase = createClient();
         const fetchUser = async () => {
             const { data } = await supabase.auth.getUser();
-            setBookingData(prev => ({ ...prev, userId: data.user?.id || "" }));
+            setBookingData(prev => ({ ...prev, user_id: data.user?.id }));
         };
         fetchUser();
     }, [])

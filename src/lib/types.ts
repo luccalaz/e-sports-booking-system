@@ -1,14 +1,15 @@
 export interface BookingData {
-    userId?: string,
-    stationId?: string,
-    stationName?: string,
     type?: string,
+    user_id?: string,
     start_timestamp?: Date,
     end_timestamp?: Date,
     duration?: number,
     name?: string,
     description?: string,
-    status?: string
+    station?: {
+        id: string,
+        name: string
+    }
 }
 
 export interface Station {
@@ -17,35 +18,30 @@ export interface Station {
     img_url: string
 }
 
+export interface User {
+    id: string,
+    first_name: string,
+    last_name: string,
+    nscc_id: string,
+    role_id: number
+}
+
 export interface Booking {
     id: string,
-    user_id: string,
+    user: User
     start_timestamp: Date,
     end_timestamp: Date,
+    duration: number,
     status: string,
     name?: string,
     description?: string
-    station?: {
-        id: string
-        name: string;
-        img_url: string;
-    }
+    station?: Station,
 }
 
-export interface LoungeBooking extends Booking {
-    name: string,
-    description: string
-}
-
-export interface StationBooking extends Booking {
-    station: {
-        id: string
-        name: string;
-        img_url: string;
-    }
-}
-
-export interface UserBooking extends Booking {
-    duration: number,
-    display: { status: string, badge: string, date_status: "upcoming" | "past" },
+export interface BookingActions {
+    cancel?: boolean,
+    end?: boolean,
+    noshow?: boolean,
+    approve?: boolean,
+    deny?: boolean
 }
