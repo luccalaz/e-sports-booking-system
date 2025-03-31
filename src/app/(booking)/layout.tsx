@@ -1,7 +1,7 @@
 import Header from "@/components/ui/header"
 import type React from "react"
 
-export default function AuthLayout({
+export default function BookingLayout({
   children,
 }: {
   children: React.ReactNode
