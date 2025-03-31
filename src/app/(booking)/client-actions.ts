@@ -299,43 +299,34 @@ export function getBookingActions(booking: Booking): string[] {
 }
 
 /**
- * Fetches the user's bookings
+ * Cancels the specified booking by updating its status to "cancelled" in the appropriate database table.
  */
-export async function getUserBookings(userId: string): Promise<Booking[]> {
+export async function cancelBooking(booking: Booking): Promise<boolean> {
     try {
         const supabase = createClient();
 
-        // Fetch station bookings (including a joined station detail) for the user.
-        const { data: stationBookings, error: stationBookingsError } = await supabase
-            .from("station_bookings")
-            .select("*, station:station_id(id, name, img_url)")
-            .eq("booked_by", userId);
-
-        // Fetch lounge bookings for the user.
-        const { data: loungeBookings, error: loungeBookingsError } = await supabase
-            .from("lounge_bookings")
-            .select()
-            .eq("booked_by", userId);
-
-        if (stationBookingsError || loungeBookingsError) {
-            throw new Error("Error fetching bookings");
+        if (booking.station) {
+            const { error } = await supabase
+                .from("station_bookings")
+                .update({ status: "cancelled" })
+                .eq("id", booking.id);
+            if (error) {
+                console.error("Error cancelling booking:", error.message);
+            }
+        } else {
+            const { error } = await supabase
+                .from("lounge_bookings")
+                .update({ status: "cancelled" })
+                .eq("id", booking.id);
+            if (error) {
+                console.error("Error cancelling booking:", error.message);
+            }
         }
 
-        // Process station bookings.
-        const processedBookings: Booking[] = [...stationBookings, ...loungeBookings].map((booking: Booking) => {
-            const start_timestamp = new Date(booking.start_timestamp);
-            const end_timestamp = new Date(booking.end_timestamp);
-            return {
-                ...booking,
-                start_timestamp,
-                end_timestamp,
-            };
-        });
-
-        return processedBookings;
+        return true;
     } catch (err) {
         console.error(err);
-        return [];
+        return false;
     }
 }
 

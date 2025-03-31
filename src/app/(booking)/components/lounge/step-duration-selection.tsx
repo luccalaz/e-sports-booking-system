@@ -7,7 +7,7 @@ import ErrorOverlay from "@/components/ui/error-overlay";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { formatDuration } from "@/lib/utils";
-import { getAvailableBookingDurations } from "../../actions";
+import { getAvailableBookingDurations } from "../../client-actions";
 import { addMinutes } from "date-fns";
 
 export interface LoungeBookingFlowStepProps {

@@ -4,7 +4,7 @@ import { formatDuration } from "@/lib/utils";
 import { ArrowLeft, Calendar, Clock, Gamepad2, Timer } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { bookStation } from "../../actions";
+import { bookStation } from "../../client-actions";
 
 export interface StationBookingFlowStepProps {
     bookingData: BookingData,
