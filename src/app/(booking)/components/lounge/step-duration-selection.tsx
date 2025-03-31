@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BookingData } from "@/lib/types";
 import { ArrowLeft } from "lucide-react";
@@ -7,7 +7,7 @@ import ErrorOverlay from "@/components/ui/error-overlay";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { formatDuration } from "@/lib/utils";
-import { getAvailableBookingDurations } from "../../booking";
+import { getAvailableBookingDurations } from "../../actions";
 import { addMinutes } from "date-fns";
 
 export interface LoungeBookingFlowStepProps {
@@ -23,15 +23,17 @@ export default function StepLoungeDurationSelection({ bookingData, setBookingDat
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
 
-    async function fetchDurations() {
-        const response = await getAvailableBookingDurations(bookingData.start_timestamp!);
-        if (!response) {
-            return setError(true);
-        }
-        setAvailableDurations(response);
-        setLoading(false);
-    };
-    fetchDurations();
+    useEffect(() => {
+        async function fetchDurations() {
+            const response = await getAvailableBookingDurations(bookingData.start_timestamp!);
+            if (!response) {
+                return setError(true);
+            }
+            setAvailableDurations(response);
+            setLoading(false);
+        };
+        fetchDurations();
+    }, [bookingData.start_timestamp]);
 
     return (
         <div className="flex flex-col gap-6 justify-between h-[472px] lg:h-[472px]">

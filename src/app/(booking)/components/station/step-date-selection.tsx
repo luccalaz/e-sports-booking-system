@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import LoadingOverlay from "@/components/ui/loading-overlay";
 import { Calendar } from "@/components/ui/calendar";
 import ErrorOverlay from "@/components/ui/error-overlay";
-import { getAvailableDates } from "../../booking";
+import { getAvailableDates } from "../../actions";
 
 export interface StationBookingFlowStepProps {
     bookingData: BookingData,

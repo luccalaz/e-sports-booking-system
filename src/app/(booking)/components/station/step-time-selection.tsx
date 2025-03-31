@@ -6,7 +6,7 @@ import LoadingOverlay from "@/components/ui/loading-overlay";
 import ErrorOverlay from "@/components/ui/error-overlay";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { getAvailableStartTimes } from "../../booking";
+import { getAvailableStartTimes } from "../../actions";
 
 export interface StationBookingFlowStepProps {
     bookingData: BookingData,

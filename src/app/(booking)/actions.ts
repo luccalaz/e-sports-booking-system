@@ -254,7 +254,10 @@ export function getDisplayStatus(
     } else {
         if (booking.status === "cancelled") return { status: "Cancelled", badge: "destructive" };
         if (booking.status === "denied") return { status: "Denied", badge: "destructive" };
-        if (booking.status === "pending") return { status: "Pending approval", badge: "warning" };
+        if (booking.status === "pending") {
+            if (now >= booking.start_timestamp) return { status: "Denied", badge: "destructive" };
+            if (now < booking.start_timestamp) return { status: "Pending approval", badge: "warning" };
+        }
         if (booking.status === "approved") {
             if (now < booking.start_timestamp) return { status: "Confirmed", badge: "default" };
             if (now >= booking.start_timestamp && now < booking.end_timestamp) return { status: "In-progress", badge: "outline" };
@@ -273,8 +276,9 @@ export function getBookingActions(booking: Booking): string[] {
 
     switch (booking.status) {
         case "pending":
-            // For pending bookings, allow approval or denial.
-            actions.push("approve", "deny", "cancel");
+            if (now < booking.start_timestamp) {
+                actions.push("approve", "deny", "cancel");
+            }
             break;
         case "approved":
         case "confirmed":
@@ -300,7 +304,6 @@ export function getBookingActions(booking: Booking): string[] {
 export async function getUserBookings(userId: string): Promise<Booking[]> {
     try {
         const supabase = createClient();
-        const now = new Date();
 
         // Fetch station bookings (including a joined station detail) for the user.
         const { data: stationBookings, error: stationBookingsError } = await supabase
