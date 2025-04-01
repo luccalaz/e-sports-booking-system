@@ -38,11 +38,12 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const isAuthRoute = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup')
+  const isRootPath = request.nextUrl.pathname === '/'
 
-  if (user && isAuthRoute) {
-    // redirect authenticated users trying to access login/signup to home
+  if (user && (isAuthRoute || isRootPath)) {
+    // redirect authenticated users trying to access login/signup/root to book
     const url = request.nextUrl.clone()
-    url.pathname = '/'
+    url.pathname = '/book'
     return NextResponse.redirect(url)
   }
 

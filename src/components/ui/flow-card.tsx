@@ -12,10 +12,12 @@ export default function FlowCard({ children, img }: FlowCardProps) {
       {img && (
         <div className="h-[150px] lg:h-auto relative order-last lg:order-first">
           <Image
-            src={img || "/placeholder.svg"}
-            alt="Card image"
             fill
-            className="object-cover object-center"
+            priority
+            src={img}
+            alt="Card image"
+            sizes="auto"
+            className="object-cover object-center -z-10"
           />
         </div>
       )}

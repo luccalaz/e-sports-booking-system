@@ -1,17 +1,21 @@
-import { Form, FormControl, FormField, FormItem } from '@/components/ui/form'
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
-import { Button } from '@/components/ui/button'
-import { useForm } from "react-hook-form"
-import { Mail } from 'lucide-react'
-import { z } from 'zod'
-import { zodResolver } from "@hookform/resolvers/zod"
-import { verifyotp } from '@/app/actions'
-import { toast } from 'sonner'
-import { redirect } from 'next/navigation'
-import { REGEXP_ONLY_DIGITS } from 'input-otp'
-import { otpformSchema } from '@/utils/formSchemas'
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { redirect } from "next/navigation";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { Mail } from "lucide-react";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { verifyotp } from "@/app/(authentication)/actions";
+import { otpformSchema } from "@/lib/formSchemas";
 
-export function VerificationForm({ schoolID, type } : { schoolID : string, type : string}) {
+
+export function VerificationForm({ schoolID }: { schoolID: string }) {
+    const [loading, setLoading] = useState<boolean>(false);
+
     const otpform = useForm<z.infer<typeof otpformSchema>>({
         resolver: zodResolver(otpformSchema),
         defaultValues: {
@@ -20,10 +24,12 @@ export function VerificationForm({ schoolID, type } : { schoolID : string, type 
     })
 
     async function onSubmitOtp(values: z.infer<typeof otpformSchema>) {
+        setLoading(true);
         const error = await verifyotp(schoolID, values);
 
         if (error) {
-            return toast.error(error);
+            setLoading(false);
+            return toast.error(error.message);
         }
 
         toast.success("Logged in successfully");
@@ -42,7 +48,7 @@ export function VerificationForm({ schoolID, type } : { schoolID : string, type 
             <form onSubmit={otpform.handleSubmit(onSubmitOtp, onError)} className="space-y-6 flex flex-col justify-center">
                 <div className="flex flex-col items-center">
                     <Mail className="text-title" size={50} />
-                    <h2 className="text-2xl text-title font-bold mt-1">{type == "login" ? "Check your email" : "Verify your account"}</h2>
+                    <h2 className="text-2xl text-title font-bold mt-1">Check your email</h2>
                     <div className="text-sm text-center text-zinc-500 pt-2">Type in the code sent to your NSCC email to continue</div>
                 </div>
                 <FormField control={otpform.control} name="otp" render={({ field }) => (
@@ -61,12 +67,13 @@ export function VerificationForm({ schoolID, type } : { schoolID : string, type 
                         </FormControl>
                     </FormItem>
                 )} />
-                <Button 
-                    type="submit" 
-                    className="w-full" 
-                    disabled={!otpform.formState.isValid || otpform.formState.isSubmitting} 
-                    loading={otpform.formState.isSubmitting ? (type == "login" ? "Logging in..." : "Verifying account...") : undefined}>
-                    {type == "login" ? "Login" : "Verify account"}
+                <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={!otpform.formState.isValid || loading}
+                    loading={loading ? "Logging in..." : undefined}
+                >
+                    Login
                 </Button>
             </form>
         </Form >
