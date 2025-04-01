@@ -30,7 +30,7 @@ export default function SignupForm() {
         const error = await signup(values)
 
         if (error) {
-            toast.error(error.message);
+            return toast.error(error.message);
         }
 
         toast.success("Email sent to " + values.schoolID + "@nscc.ca");

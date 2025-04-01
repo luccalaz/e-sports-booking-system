@@ -32,6 +32,7 @@ export default function LoginForm() {
         if (error) {
             toast.error(error.message);
             if (error.code === "USER_NOT_FOUND") return redirect("/signup");
+            return;
         }
 
         toast.success("Email sent to " + values.schoolID + "@nscc.ca");
