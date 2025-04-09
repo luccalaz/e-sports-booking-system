@@ -56,14 +56,6 @@ export function DashboardSidebar({ user }: { user: User }) {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild isActive={route === "/dashboard"} onClick={() => setOpenMobile(false)}>
-                                    <Link href="/dashboard">
-                                        <LayoutDashboard />
-                                        <span>Dashboard</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                            <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={route === "/dashboard/bookings"} onClick={() => setOpenMobile(false)}>
                                     <Link href="/dashboard/bookings">
                                         <CalendarRange />

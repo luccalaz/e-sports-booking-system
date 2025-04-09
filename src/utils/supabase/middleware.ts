@@ -43,6 +43,12 @@ export async function updateSession(request: NextRequest) {
   const isRootPath = request.nextUrl.pathname === "/";
 
   if (user && isDashboardRoute) {
+    if (request.nextUrl.pathname === "/dashboard") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard/bookings";
+      return NextResponse.redirect(url);
+    }
+
     // Ensure the user is an admin
     const { data: profile, error } = await supabase
       .from("profiles")
