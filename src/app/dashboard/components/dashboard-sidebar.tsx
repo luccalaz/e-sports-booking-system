@@ -18,7 +18,7 @@ import {
 import { User } from "@/lib/types"
 import { capitalizeFirstLetter, getInitials } from "@/lib/utils"
 import { createClient } from "@/utils/supabase/client"
-import { CalendarRange, ChevronsUpDown, Gamepad2, LayoutDashboard, LogOut, Settings } from "lucide-react"
+import { CalendarRange, ChevronsUpDown, Gamepad2, LogOut, Settings } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { toast } from "sonner"
@@ -109,7 +109,7 @@ export function DashboardSidebar({ user }: { user: User }) {
                                 sideOffset={4}
                             >
                                 <DropdownMenuGroup>
-                                    <DropdownMenuItem className="text-red-700" onClick={logOut}>
+                                    <DropdownMenuItem className="text-destructive" onClick={logOut}>
                                         <LogOut />
                                         Log out
                                     </DropdownMenuItem>

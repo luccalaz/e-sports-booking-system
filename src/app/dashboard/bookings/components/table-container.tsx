@@ -4,12 +4,13 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import React, { useEffect, useState } from 'react'
-import { DataTable, StationBooking } from './data-table'
+import { BookingsDataTable, StationBooking } from './data-table'
 import { getBookingsForDate } from '../actions'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import TableSkeleton from './table-skeleton'
+import { createClient } from '@/utils/supabase/client'
 
-export default function BookingsDataTable() {
+export default function BookingsTableContainer() {
     const [date, setDate] = useState<Date>(new Date());
     const [data, setData] = useState<StationBooking[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -19,19 +20,41 @@ export default function BookingsDataTable() {
 
     useEffect(() => {
         async function fetchBookings() {
-            if (date) {
-                const data = await getBookingsForDate(date);
-                setData(data);
-                setLoading(false);
-            }
+            const data = await getBookingsForDate(date);
+            setData(data);
+            setLoading(false);
+        }
+
+        async function refreshBookings() {
+            const refreshedData = await getBookingsForDate(date)
+            setData(refreshedData)
         }
 
         fetchBookings();
+
+        const supabase = createClient();
+        // Create a channel for changes to the "station_bookings" table.
+        const channel = supabase
+            .channel("public:station_bookings") // name your channel (suggested: include schema and table)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'station_bookings'
+                },
+                () => refreshBookings()
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, [date])
 
     return (
         <div className="flex flex-col gap-6">
-            <div className="flex flex-col xl:flex-row justify-between gap-3">
+            <div className="flex flex-col xl:flex-row justify-between gap-5">
                 <Tabs value={type} onValueChange={(t) => setType(t)} className="w-full md:w-60">
                     <TabsList className="w-full">
                         <TabsTrigger value="stations" className="flex-grow">Stations</TabsTrigger>
@@ -62,10 +85,10 @@ export default function BookingsDataTable() {
                 </div>
             </div>
             {type === "stations" && (
-                loading ? <TableSkeleton /> : <DataTable data={data} filter={filter} searchQuery={searchQuery} />
+                loading ? <TableSkeleton /> : <BookingsDataTable data={data} filter={filter} searchQuery={searchQuery} />
             )}
             {type === "events" && (
-                "Events table"
+                <TableSkeleton />
             )}
         </div>
     )

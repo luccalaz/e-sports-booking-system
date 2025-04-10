@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/breadcrumb"
 import { usePathname } from 'next/navigation'
 import Link from 'next/link';
-import { capitalizeFirstLetter } from '@/lib/utils';
 
 export default function AppBreadcrumb() {
     const route = usePathname();

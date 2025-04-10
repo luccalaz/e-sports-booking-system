@@ -23,7 +23,7 @@ export function DatePicker({ date, setDate, className, placeholder = "Pick a dat
             <PopoverTrigger asChild>
                 <Button
                     variant={"outline"}
-                    className={cn("justify-start text-left font-normal", !date && "text-muted-foreground", className)}
+                    className={cn("justify-start text-left font-normal hover:bg-transparent", !date && "text-muted-foreground", className)}
                 >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {date ? format(date, "PPP") : <span>{placeholder}</span>}

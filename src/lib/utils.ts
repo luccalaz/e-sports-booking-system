@@ -50,6 +50,73 @@ export function formatDuration(minutes: number): string {
   return parts.join(" ");
 }
 
+export type BookingDisplayStatus = {
+  displayStatus: string;
+  badgeVariant:
+    | "default"
+    | "outline"
+    | "destructive"
+    | "secondary"
+    | "warning";
+};
+
+export function getBookingDisplayStatus(
+  bookingStatus: "confirmed" | "cancelled" | "noshow",
+  startTime: Date,
+  duration: number,
+  now: Date = new Date(),
+): BookingDisplayStatus {
+  if (bookingStatus === "cancelled") {
+    return { displayStatus: "Cancelled", badgeVariant: "destructive" };
+  }
+  if (bookingStatus === "noshow") {
+    return { displayStatus: "No-show", badgeVariant: "warning" };
+  }
+  if (bookingStatus === "confirmed") {
+    const endTime = new Date(startTime.getTime() + duration * 60000);
+
+    if (now < startTime) {
+      return { displayStatus: "Upcoming", badgeVariant: "default" };
+    } else if (now >= startTime && now < endTime) {
+      return { displayStatus: "In-progress", badgeVariant: "outline" };
+    } else if (now >= endTime) {
+      return { displayStatus: "Ended", badgeVariant: "outline" };
+    }
+  }
+
+  // Fallback if none of the conditions match.
+  return { displayStatus: "Unknown", badgeVariant: "outline" };
+}
+
+export type BookingActionKey = "cancel" | "end" | "noShow";
+
+export function getBookingActions(
+  bookingStatus: "confirmed" | "cancelled" | "noshow",
+  startTime: Date,
+  duration: number,
+  now: Date = new Date(),
+): BookingActionKey[] {
+  // Only confirmed bookings can have actions (others have no actions).
+  if (bookingStatus !== "confirmed") {
+    return [];
+  }
+
+  // Convert duration to number (minutes)
+  const endTime = new Date(startTime.getTime() + duration * 60000);
+
+  if (now < startTime) {
+    // Upcoming booking: allow cancellation.
+    return ["cancel"];
+  } else if (now >= startTime && now < endTime) {
+    // In-progress: allow ending the booking and marking as no-show.
+    return ["end", "noShow"];
+  } else if (now >= endTime) {
+    // Ended: allow marking as no-show.
+    return ["noShow"];
+  }
+  return [];
+}
+
 /**
  * Merges two availability schedules, using the primary schedule if available.
  */

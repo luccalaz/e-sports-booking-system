@@ -9,12 +9,11 @@ import {
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
-    getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table"
 import { format } from "date-fns"
-import { CalendarX, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal } from "lucide-react"
+import { CalendarOff, CalendarX, ChevronDown, ChevronUp, MoreHorizontal, UserX } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -22,19 +21,21 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { cn, getInitials } from "@/lib/utils"
+import { formatDuration, getBookingActions, getBookingDisplayStatus, getInitials } from "@/lib/utils"
+import { cancelBooking, markNoShow } from "../actions"
+import { toast } from "sonner"
+import BookingCard from "./booking-card"
 
 // Define the booking data type
 export type StationBooking = {
     id: string;
     date: Date;
-    duration: string;
+    duration: number;
     station: string;
     booked_by: {
         first_name: string;
@@ -55,15 +56,42 @@ export type StationBookingColumnDef<TData = StationBooking> = ColumnDef<TData, u
 export const columns: StationBookingColumnDef[] = [
     {
         accessorKey: "date",
-        header: "Time",
+        enableSorting: true, // enable sorting for this column
+        sortingFn: "datetime", // use built‑in date sorting
+        header: ({ column }) => {
+            const sortState = column.getIsSorted();
+            return (
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="-ml-3 pl-3"
+                    onClick={() => column.toggleSorting(sortState === "asc")}
+                >
+                    Time
+                    {sortState === "asc" ? (
+                        <ChevronUp className="ml-1 h-4 w-4" />
+                    ) : sortState === "desc" ? (
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                    ) : (
+                        // When unsorted we treat it as ascending by default
+                        <ChevronUp className="ml-1 h-4 w-4" />
+                    )}
+                </Button>
+            );
+        },
         cell: ({ row }) => {
-            const date = row.getValue("date") as Date
-            return <div>{format(date, "h:mm a")}</div>
+            const date = row.getValue("date") as Date;
+            return <div>{format(date, "h:mm a")}</div>;
         },
     },
     {
         accessorKey: "duration",
         header: "Duration",
+        cell: ({ row }) => {
+            return (
+                <div>{formatDuration(row.original.duration)}</div>
+            )
+        }
     },
     {
         accessorKey: "station",
@@ -79,8 +107,8 @@ export const columns: StationBookingColumnDef[] = [
 
             return (
                 <div className="flex items-center gap-2">
-                    <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-muted text-muted-foreground text-xs">{initials}</AvatarFallback>
+                    <Avatar className="h-8 w-8 rounded-lg">
+                        <AvatarFallback className="bg-muted text-muted-foreground text-xs rounded-lg">{initials}</AvatarFallback>
                     </Avatar>
                     <span>{name}</span>
                 </div>
@@ -92,48 +120,21 @@ export const columns: StationBookingColumnDef[] = [
         header: "Status",
         cell: ({ row }) => {
             const booking = row.original;
-            const now = new Date();
+            const { displayStatus, badgeVariant } = getBookingDisplayStatus(booking.status, booking.date, booking.duration);
 
-            let statusLabel = "Unknown";
-            let badgeVariant: "default" | "outline" | "destructive" | "secondary" | "warning" = "outline";
-
-            if (booking.status === "cancelled") {
-                statusLabel = "Cancelled";
-                badgeVariant = "destructive";
-            } else if (booking.status === "noshow") {
-                statusLabel = "No-show";
-                badgeVariant = "warning";
-            } else if (booking.status === "confirmed") {
-                const start = booking.date;
-                const end = new Date(start.getTime() + parseInt(booking.duration) * 60000);
-
-                if (now < start) {
-                    statusLabel = "Upcoming";
-                    badgeVariant = "default";
-                } else if (now >= start && now < end) {
-                    statusLabel = "In-progress";
-                    badgeVariant = "outline";
-                } else if (now >= end) {
-                    statusLabel = "Ended";
-                    badgeVariant = "outline";
-                }
-            }
-
-            return (
-                <Badge variant={badgeVariant} className="capitalize">
-                    {statusLabel}
-                </Badge>
-            );
+            return <Badge variant={badgeVariant}>{displayStatus}</Badge>;
         },
     },
     {
         id: "actions",
         meta: {
-            className: "w-16", // 👈 Tailwind width class for column cell and head
+            className: "w-16",
         },
         cell: ({ row }) => {
-            const booking = row.original
+            const booking = row.original;
+            const actions = getBookingActions(booking.status, booking.date, booking.duration);
 
+            // Then, render the actions conditionally:
             return (
                 <div className="text-right">
                     <DropdownMenu>
@@ -144,22 +145,57 @@ export const columns: StationBookingColumnDef[] = [
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(booking.id)}>
-                                Copy booking ID
+                            <DropdownMenuItem>
+                                <MoreHorizontal className="h-4 w-4" />
+                                View details
                             </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>View details</DropdownMenuItem>
-                            <DropdownMenuItem>Edit booking</DropdownMenuItem>
-                            {booking.status !== "cancelled" && (
-                                <DropdownMenuItem className="text-red-600">Cancel booking</DropdownMenuItem>
+
+                            {(actions.includes("cancel") || actions.includes("end")) && (
+                                <>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                        className="text-destructive"
+                                        onClick={async (e) => {
+                                            e.stopPropagation();
+                                            try {
+                                                await cancelBooking(booking);
+                                                toast.success("Booking cancelled");
+                                            } catch (error) {
+                                                console.error("Error cancelling booking:", error);
+                                            }
+                                        }}
+                                    >
+                                        <CalendarOff className="h-4 w-4" />
+                                        Cancel
+                                    </DropdownMenuItem>
+                                </>
+                            )}
+
+                            {actions.includes("noShow") && (
+                                <>
+                                    {!(actions.includes("cancel") || actions.includes("end")) && <DropdownMenuSeparator />}
+                                    <DropdownMenuItem
+                                        onClick={async (e) => {
+                                            e.stopPropagation();
+                                            try {
+                                                await markNoShow(booking);
+                                                toast.success("Booking marked as no-show");
+                                            } catch (error) {
+                                                console.error("Error marking as no-show:", error);
+                                            }
+                                        }}
+                                    >
+                                        <UserX className="h-4 w-4" />
+                                        No show
+                                    </DropdownMenuItem>
+                                </>
                             )}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
-            )
+            );
         },
-    },
+    }
 ]
 
 interface BookingsDataTableProps {
@@ -168,8 +204,8 @@ interface BookingsDataTableProps {
     searchQuery: string
 }
 
-export function DataTable({ data, filter, searchQuery }: BookingsDataTableProps) {
-    const [sorting, setSorting] = React.useState<SortingState>([])
+export function BookingsDataTable({ data, filter, searchQuery }: BookingsDataTableProps) {
+    const [sorting, setSorting] = React.useState<SortingState>([{ id: "date", desc: false }])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
@@ -182,9 +218,9 @@ export function DataTable({ data, filter, searchQuery }: BookingsDataTableProps)
         if (filter !== "all") {
             const now = new Date();
             if (filter === "upcoming") {
-                result = result.filter((booking) => now < new Date(booking.date.getTime() + parseInt(booking.duration) * 60000));
+                result = result.filter((booking) => now < new Date(booking.date.getTime() + booking.duration * 60000));
             } else if (filter === "past") {
-                result = result.filter((booking) => now >= new Date(booking.date.getTime() + parseInt(booking.duration) * 60000));
+                result = result.filter((booking) => now >= new Date(booking.date.getTime() + booking.duration * 60000));
             }
         }
 
@@ -209,7 +245,6 @@ export function DataTable({ data, filter, searchQuery }: BookingsDataTableProps)
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
@@ -225,16 +260,13 @@ export function DataTable({ data, filter, searchQuery }: BookingsDataTableProps)
     return (
         <div className="w-full">
             <div className="rounded-md border">
-                <Table className="table-fixed">
+                <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead
-                                            key={header.id}
-                                            className={cn("h-10", (header.column.columnDef.meta as { className?: string })?.className)}
-                                        >
+                                        <TableHead key={header.id} className="h-10">
                                             {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                                         </TableHead>
                                     )
@@ -247,12 +279,11 @@ export function DataTable({ data, filter, searchQuery }: BookingsDataTableProps)
                             table.getRowModel().rows.map((row) => (
                                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"} className="">
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell
-                                            key={cell.id}
-                                            className={cn((cell.column.columnDef.meta as { className?: string })?.className)}
-                                        >
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </TableCell>
+                                        <BookingCard key={cell.id} booking={cell.row.original}>
+                                            <TableCell className="text-nowrap">
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        </BookingCard>
                                     ))}
                                 </TableRow>
                             ))
@@ -268,40 +299,6 @@ export function DataTable({ data, filter, searchQuery }: BookingsDataTableProps)
                         )}
                     </TableBody>
                 </Table>
-            </div>
-            <div className="flex items-center justify-between space-x-2 py-4">
-                <div className="text-sm text-muted-foreground">
-                    Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-                </div>
-                <div className="flex items-center space-x-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.setPageIndex(0)}
-                        disabled={!table.getCanPreviousPage()}
-                    >
-                        <ChevronsLeft />
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                    >
-                        <ChevronLeft />
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-                        <ChevronRight />
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                        disabled={!table.getCanNextPage()}
-                    >
-                        <ChevronsRight />
-                    </Button>
-                </div>
             </div>
         </div>
     )
