@@ -16,6 +16,7 @@ export interface Station {
     id: string;
     name: string;
     img_url: string;
+    status: string;
 }
 
 export interface User {

@@ -1,8 +1,8 @@
 "use client"
 
 import FlowCard from "@/components/ui/flow-card";
-import BookingFlow from "../components/booking-flow";
 import { useState } from "react";
+import BookingFlow from "../../components/booking-flow";
 
 export default function Home() {
     const [image, setImage] = useState<string>("")

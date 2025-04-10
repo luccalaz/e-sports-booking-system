@@ -1,5 +1,5 @@
 import FlowCard from '@/components/ui/flow-card'
-import SignupForm from '../components/signup-form'
+import SignupForm from '../../components/signup-form'
 
 export default async function Signup() {
   return (

@@ -7,8 +7,10 @@ import React, { useEffect, useState } from 'react'
 import { BookingsDataTable, StationBooking } from './data-table'
 import { getBookingsForDate } from '../actions'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import TableSkeleton from './table-skeleton'
 import { createClient } from '@/utils/supabase/client'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
 
 export default function BookingsTableContainer() {
     const [date, setDate] = useState<Date>(new Date());
@@ -33,9 +35,8 @@ export default function BookingsTableContainer() {
         fetchBookings();
 
         const supabase = createClient();
-        // Create a channel for changes to the "station_bookings" table.
         const channel = supabase
-            .channel("public:station_bookings") // name your channel (suggested: include schema and table)
+            .channel("public:station_bookings")
             .on(
                 'postgres_changes',
                 {
@@ -92,4 +93,36 @@ export default function BookingsTableContainer() {
             )}
         </div>
     )
+}
+
+
+function TableSkeleton() {
+    const columnWidths = ["w-24", "w-32", "w-28", "w-40", "w-36", "w-5"];
+    const rowCount = 5;
+    return (
+        <div className="rounded-md border">
+            <Table className="table-fixed w-full">
+                <TableHeader>
+                    <TableRow>
+                        {columnWidths.map((width, idx) => (
+                            <TableHead key={idx} className={`h-10 ${width}`}>
+                                <Skeleton className={`h-4 ${width}`} />
+                            </TableHead>
+                        ))}
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {Array.from({ length: rowCount }).map((_, rowIndex) => (
+                        <TableRow key={rowIndex}>
+                            {columnWidths.map((width, colIndex) => (
+                                <TableCell key={colIndex} className={cn(width, "h-16")}>
+                                    <Skeleton className={`h-4 ${width}`} />
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </div>
+    );
 }

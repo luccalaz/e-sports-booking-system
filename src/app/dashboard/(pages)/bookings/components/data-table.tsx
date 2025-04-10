@@ -56,8 +56,8 @@ export type StationBookingColumnDef<TData = StationBooking> = ColumnDef<TData, u
 export const columns: StationBookingColumnDef[] = [
     {
         accessorKey: "date",
-        enableSorting: true, // enable sorting for this column
-        sortingFn: "datetime", // use built‑in date sorting
+        enableSorting: true,
+        sortingFn: "datetime",
         header: ({ column }) => {
             const sortState = column.getIsSorted();
             return (
@@ -134,7 +134,6 @@ export const columns: StationBookingColumnDef[] = [
             const booking = row.original;
             const actions = getBookingActions(booking.status, booking.date, booking.duration);
 
-            // Then, render the actions conditionally:
             return (
                 <div className="text-right">
                     <DropdownMenu>

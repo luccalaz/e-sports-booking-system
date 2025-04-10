@@ -1,5 +1,8 @@
 import React from 'react'
 import BookingsTableContainer from './components/table-container'
+import { Button } from '@/components/ui/button'
+import { PlusIcon } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Bookings() {
 
@@ -10,10 +13,12 @@ export default function Bookings() {
                     <h1 className="text-2xl font-bold tracking-tight">Bookings</h1>
                     <p className="text-muted-foreground">Manage and view all bookings in the E-Sports Lounge</p>
                 </div>
-                {/* <Button size="sm">
-                <PlusIcon className="mr-2 h-4 w-4" />
-                New Booking
-            </Button> */}
+                <Button size="sm" asChild>
+                    <Link href={"/book"}>
+                        <PlusIcon className="mr-2 h-4 w-4" />
+                        New Booking
+                    </Link>
+                </Button>
             </div>
             <BookingsTableContainer />
         </div >

@@ -5,9 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createClient } from "@/utils/supabase/server";
 import { Booking } from "@/lib/types";
-import { getUserBookings } from "../server-actions";
 import InfoOverlay from "@/components/ui/info-overlay";
-import UserBooking from "../components/user-booking";
+import { getUserBookings } from "../../server-actions";
+import UserBooking from "../../components/user-booking";
+
 
 export default async function Bookings() {
     const supabase = await createClient();
