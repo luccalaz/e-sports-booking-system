@@ -13,7 +13,6 @@ import { toast } from "sonner"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { addStation } from "../actions"
-import { useRouter } from "next/navigation"
 
 export default function AddStation({ children }: { children: React.ReactNode }) {
     const [open, setOpen] = React.useState(false)

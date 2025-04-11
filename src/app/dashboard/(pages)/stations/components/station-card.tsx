@@ -3,7 +3,6 @@
 import React from 'react'
 import Image from 'next/image'
 import { Station } from '@/lib/types'
-import { useRouter } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -12,7 +11,7 @@ import { Switch } from '@/components/ui/switch'
 import { deleteStation, editStation, setStationStatus } from '../actions'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
+import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { useMediaQuery } from '@/hooks/use-media-query'
 import { useForm } from 'react-hook-form'
 import { stationEditSchema } from '@/lib/formSchemas'
@@ -22,7 +21,6 @@ import { z } from 'zod'
 import { Input } from '@/components/ui/input'
 
 export function StationCard({ station }: { station: Station }) {
-    const router = useRouter();
     const active = station.status === "available";
     const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
     const [showEditDialog, setShowEditDialog] = React.useState(false);
@@ -175,7 +173,7 @@ function EditStationDialog({ station, open, onOpenChange }: StationDialogProps) 
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
                                 <DialogHeader>
                                     <DialogTitle>Edit new station</DialogTitle>
-                                    <DialogDescription className="text-sm text-muted-foreground">Create a new gaming station for the E-Sports Lounge.</DialogDescription>
+                                    <DialogDescription className="text-sm text-muted-foreground">Edit a gaming station for the E-Sports Lounge.</DialogDescription>
                                 </DialogHeader>
                                 <FormField
                                     control={form.control}
@@ -212,7 +210,7 @@ function EditStationDialog({ station, open, onOpenChange }: StationDialogProps) 
                                         Add new station
                                     </DrawerTitle>
                                     <DrawerDescription className="text-left">
-                                        Create a new gaming station for the E-Sports Lounge.
+                                        Edit a gaming station for the E-Sports Lounge.
                                     </DrawerDescription>
                                 </DrawerHeader>
                                 <FormField
