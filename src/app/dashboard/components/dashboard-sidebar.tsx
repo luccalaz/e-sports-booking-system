@@ -71,14 +71,6 @@ export function DashboardSidebar({ user }: { user: User }) {
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton asChild isActive={route === "/dashboard/settings"} onClick={() => setOpenMobile(false)}>
-                                    <Link href="/dashboard/settings">
-                                        <Settings />
-                                        <span>Settings</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
