@@ -3,6 +3,7 @@ import { Mulish } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { AuthProvider } from "@/components/user-profile-context";
 
 const mulish = Mulish({ subsets: ["latin"] });
 
@@ -25,8 +26,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <Toaster duration={8000} richColors />
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+          <Toaster duration={4000} richColors />
         </ThemeProvider>
       </body>
     </html>

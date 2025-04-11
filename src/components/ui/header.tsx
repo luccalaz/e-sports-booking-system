@@ -15,7 +15,7 @@ export default function Header({ loggedIn = false }: HeaderProps) {
                 <Logo />
                 <div className="flex gap-3">
                     <Button className="text-foreground" variant="link" asChild>
-                        <Link href={loggedIn ? "/bookings" : "/login"}>
+                        <Link href={loggedIn ? "/bookings" : "/login"} className="text-sm">
                             {loggedIn ? "My Bookings" : "Login"}
                         </Link>
                     </Button>

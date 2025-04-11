@@ -24,9 +24,9 @@ export default function LogoutButton() {
                 router.push("/login");
             },
             {
-                loading: 'Signing you out...',
-                success: 'Signed out successfully',
-                error: 'Error signing out. Please try again',
+                loading: 'Logging you out...',
+                success: 'Logged out successfully',
+                error: 'Error logging out. Please try again',
             }
         );
     }

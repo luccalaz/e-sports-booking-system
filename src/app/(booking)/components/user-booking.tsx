@@ -39,7 +39,6 @@ export default function UserBooking(booking: Booking) {
                         {booking.station?.name || booking.name}
                     </div>
                     <Badge
-                        className="h-5"
                         variant={
                             display.badge as
                             | "default"

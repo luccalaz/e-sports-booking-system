@@ -1,5 +1,5 @@
 import FlowCard from '@/components/ui/flow-card'
-import LoginForm from '../components/login-form'
+import LoginForm from '../../components/login-form'
 
 export default async function Login() {
   return (
