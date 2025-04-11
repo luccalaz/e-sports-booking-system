@@ -12,10 +12,6 @@ import { cancelBooking, markNoShow } from '../actions'
 import { toast } from 'sonner'
 import { useMediaQuery } from '@/hooks/use-media-query'
 
-
-
-
-
 export default function BookingCard({ booking, children }: { booking: StationBooking, children: React.ReactNode }) {
     const { displayStatus, badgeVariant } = getBookingDisplayStatus(booking.status, booking.date, booking.duration);
     const actions = getBookingActions(booking.status, booking.date, booking.duration);

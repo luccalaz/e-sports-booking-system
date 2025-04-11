@@ -34,3 +34,38 @@ export async function setStationStatus(
 
     return true;
 }
+
+export async function deleteStation(station_id: string) {
+    const supabase = createClient();
+    const { error } = await supabase
+        .from("stations")
+        .delete()
+        .eq("id", station_id);
+
+    if (error) return false;
+
+    return true;
+}
+
+export async function addStation(station_name: string) {
+    const supabase = createClient();
+    const { error } = await supabase
+        .from("stations")
+        .insert({ name: station_name });
+
+    if (error) return false;
+
+    return true;
+}
+
+export async function editStation(station_id: string, station_name: string) {
+    const supabase = createClient();
+    const { error } = await supabase
+        .from("stations")
+        .update({ name: station_name })
+        .eq("id", station_id);
+
+    if (error) return false;
+
+    return true;
+}

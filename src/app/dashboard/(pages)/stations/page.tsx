@@ -2,6 +2,7 @@ import React from 'react'
 import { Button } from '@/components/ui/button'
 import { PlusIcon } from 'lucide-react'
 import StationsList from './components/stations-list'
+import AddStation from './components/add-station'
 
 
 export default function Stations() {
@@ -12,10 +13,12 @@ export default function Stations() {
                     <h1 className="text-2xl font-bold tracking-tight">Stations</h1>
                     <p className="text-muted-foreground">Manage gaming stations in the E-Sports Lounge</p>
                 </div>
-                <Button size="sm">
-                    <PlusIcon className="mr-1 h-4 w-4" />
-                    New Station
-                </Button>
+                <AddStation>
+                    <Button size="sm">
+                        <PlusIcon className="mr-1 h-4 w-4" />
+                        New Station
+                    </Button>
+                </AddStation>
             </div>
             <StationsList />
         </div >

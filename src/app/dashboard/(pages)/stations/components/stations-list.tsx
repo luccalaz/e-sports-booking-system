@@ -6,12 +6,19 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Station } from '@/lib/types';
 import { getStations } from '../actions';
 import { AlertTriangle } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
 
 export default function StationsList() {
     const [stations, setStations] = React.useState<Station[]>([]);
     const [loading, setLoading] = React.useState<boolean>(true);
 
+
     useEffect(() => {
+        async function refreshStations() {
+            const data = await getStations();
+            setStations(data);
+        }
+
         async function fetchStations() {
             const data = await getStations();
             setStations(data)
@@ -19,6 +26,24 @@ export default function StationsList() {
         }
 
         fetchStations()
+
+        const supabase = createClient();
+        const channel = supabase
+            .channel("public:stations")
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'stations'
+                },
+                () => refreshStations()
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, [])
 
     return (

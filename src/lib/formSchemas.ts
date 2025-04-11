@@ -4,7 +4,7 @@ export const otpformSchema = z.object({
     otp: z.string().nonempty({
         message: "The code is required to verify.",
     }).min(6).max(6),
-})
+});
 
 export const signupformSchema = z.object({
     firstName: z.string().nonempty({
@@ -30,7 +30,7 @@ export const signupformSchema = z.object({
     }).regex(/^w\d{7}$/i, {
         message: "Invalid school ID.",
     }),
-})
+});
 
 export const loginformSchema = z.object({
     schoolID: z.string().nonempty({
@@ -38,4 +38,12 @@ export const loginformSchema = z.object({
     }).regex(/^w\d{7}$/i, {
         message: "Invalid school ID.",
     }),
-})
+});
+
+export const stationEditSchema = z.object({
+    name: z.string().nonempty({
+        message: "A name is required.",
+    }).max(20, {
+        message: "Name must contain at most 20 characters",
+    }),
+});
