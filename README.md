@@ -1,6 +1,6 @@
 # E-Sports Lounge Booking System
 
-Check out a live demo preview of the application at https://e-sports-booking-system.vercel.app.
+Check out a live demo preview of the application at https://esportslounge.luccalaz.com
 
 ## Overview
 The **E-Sports Lounge Booking System** is a web application designed to facilitate the reservation and management of gaming stations in the NSCC Truro Campus E-Sports Lounge. The system allows students and staff to book gaming stations or the full lounge for events, track availability, manage their reservations, and provides an admin dashboard for lounge managers to oversee operations efficiently.
