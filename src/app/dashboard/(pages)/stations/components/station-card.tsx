@@ -172,7 +172,7 @@ function EditStationDialog({ station, open, onOpenChange }: StationDialogProps) 
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
                                 <DialogHeader>
-                                    <DialogTitle>Edit new station</DialogTitle>
+                                    <DialogTitle>Edit station</DialogTitle>
                                     <DialogDescription className="text-sm text-muted-foreground">Edit a gaming station for the E-Sports Lounge.</DialogDescription>
                                 </DialogHeader>
                                 <FormField
@@ -207,7 +207,7 @@ function EditStationDialog({ station, open, onOpenChange }: StationDialogProps) 
                             <form onSubmit={form.handleSubmit(onSubmit)} >
                                 <DrawerHeader className="mt-5 pl-0">
                                     <DrawerTitle className="text-xl font-bold text-left">
-                                        Add new station
+                                        Edit station
                                     </DrawerTitle>
                                     <DrawerDescription className="text-left">
                                         Edit a gaming station for the E-Sports Lounge.
